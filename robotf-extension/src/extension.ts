@@ -6,11 +6,12 @@ import * as vscode from 'vscode';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-    vscode.languages.registerCompletionItemProvider('plaintext', {
+    let action = vscode.languages.registerCompletionItemProvider('robot', {
 		provideCompletionItems() {
 			return [new vscode.CompletionItem('Hello World')];
 		}
 	});
+	context.subscriptions.push(action);
 }
 
 // this method is called when your extension is deactivated

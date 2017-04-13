@@ -11,13 +11,19 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:robotframework"
+        "onLanguage:robot"
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
-            "command": "extension.sayHello",
-            "title": "Hello World"
+        "languages": [{
+            "id": "robot",
+            "aliases": [
+                "robotframework"
+            ],
+            "extensions": [
+                "robot"
+            ],
+            "configuration": "./language-configuration.json"
         }]
     },
     "scripts": {
@@ -32,5 +38,11 @@
         "mocha": "^2.3.3",
         "@types/node": "^6.0.40",
         "@types/mocha": "^2.2.32"
+    },
+    "capabilities": {
+        "completionProvider": {
+            "resolveProvider": "true",
+            "triggerCharacter": ["."]
+        }
     }
 }
