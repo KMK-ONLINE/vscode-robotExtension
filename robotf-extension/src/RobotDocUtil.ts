@@ -67,7 +67,7 @@ export class RobotDocUtil{
             thisFolderPath = thisFolderPath.replace(/(\w+-?)+\/$/, "");
         }
         let foundedPath = thisFolderPath + filePath;
-        let workspace = vscode.workspace.findFiles(foundedPath);
+        let workspace = vscode.workspace.textDocuments;
         for(let i = 0, index = 0; i < workspace.length; i++){
             if(workspace[i].fileName == foundedPath)
                 return workspace[i];
