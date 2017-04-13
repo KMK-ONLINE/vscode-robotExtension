@@ -45,7 +45,7 @@ export class RobotDocUtil{
                     same = true;
                     j = included.length;
                 }
-                if(!same && /\.[robot|txt]$/.test(workspace[i].fileName)){
+                if(!same && /\.(robot|txt)$/.test(workspace[i].fileName)){
                     notIncluded.push(workspace[i]);
                 }
             }
