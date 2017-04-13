@@ -3,12 +3,12 @@
 import vscode = require('vscode');
 import {RobotDocUtil} from './RobotDocUtil';
 
-class RobotCompletionProvider implements vscode.CompletionItemProvider{
+export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[]{
 		let thisFileName = RobotDocUtil.fileNameExtractor(document);
 		let line = document.lineAt(position);
-		let keywordSearcherMatch = line.text.match(/(.+)\.(.*)$/);
-		let firstSearcherMatch = line.text.match(/^(.+)$/);
+		let keywordSearcherMatch = line.text.match(/^\s+(.+)\.(.*)$/);
+		let firstSearcherMatch = line.text.match(/^\s+(.+)$/);
 		if(keywordSearcherMatch){
 			return this.keywordMatch(document, keywordSearcherMatch[1], keywordSearcherMatch[2]);
 		}
@@ -31,13 +31,21 @@ class RobotCompletionProvider implements vscode.CompletionItemProvider{
 			}
 		}
 		let keywords = RobotDocUtil.keywordSearcher(file);
-		let suggestionsString = RobotDocUtil.sentenceLikelyAnalyzer(keyword, keywords);
+		let suggestionsString:string[];
+		if(keyword != ""){
+			suggestionsString = RobotDocUtil.sentenceLikelyAnalyzer(keyword, keywords);
+		}
+		else{
+			suggestionsString = keywords;
+		}
+		this.logArray(suggestionsString); //for testing
 		return this.stringArrayToCompletionItems(suggestionsString);
 	}
 
 	private fileMatch(document: vscode.TextDocument, fileName:string):vscode.CompletionItem[]{
 		let included = RobotDocUtil.allIncludedResourceSearcher(document);
 		let includedString = RobotDocUtil.documentsToNames(included);
+		this.logArray(includedString); //for testing
 		let suggestionsString = RobotDocUtil.sentenceLikelyAnalyzer(fileName, includedString);
 		return this.stringArrayToCompletionItems(suggestionsString);
 	}
@@ -48,5 +56,11 @@ class RobotCompletionProvider implements vscode.CompletionItemProvider{
 			items.push(new vscode.CompletionItem(suggestions[i]));
 		}
 		return items;
+	}
+
+	private logArray(array:string[]){
+		for(let i = 0; i < array.length; i++){
+			console.log(array[i]);
+		}
 	}
 }

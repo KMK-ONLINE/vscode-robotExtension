@@ -25,9 +25,10 @@ export class RobotDocUtil{
 		let resources:vscode.TextDocument[];
 		for(let i = 0; i < fileLength; i++){
 			let line = document.lineAt(i);
-			let matches = line.text.match(/^Resource\s+(\w+\\.[robot|txt])\s*$/);
+			let matches = line.text.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
 			if(matches){
-                resources.push(RobotDocUtil.documentSearcher(document, matches[1]));
+                let docs = RobotDocUtil.documentSearcher(document, matches[1]);
+                resources.push(docs);
 			}
         }
 		return resources;
@@ -55,18 +56,18 @@ export class RobotDocUtil{
     public static fileNameExtractor(file:vscode.TextDocument):string{
         let fileName = file.fileName;
         fileName = fileName.replace(/\.\w+$/, "");
-        let match = fileName.match(/^[.*\/]*(w+)$/);
+        let match = fileName.match(/(\w+)$/);
         return match[1];
     }
 
     public static documentSearcher(thisDocument:vscode.TextDocument, filePath:string):vscode.TextDocument{
-        let thisFolderPath = thisDocument.fileName.replace(/\w+.\w+/, "");
+        let thisFolderPath = thisDocument.fileName.replace(/\w+.\w+$/, "");
         while(filePath.match(/^\.\.\.?\//)){
             filePath = filePath.replace(/^\.\.\.?\//, "");
-            thisFolderPath = thisFolderPath.replace(/\w+\/$/, "");
+            thisFolderPath = thisFolderPath.replace(/(\w+-?)+\/$/, "");
         }
         let foundedPath = thisFolderPath + filePath;
-        let workspace = vscode.workspace.textDocuments;
+        let workspace = vscode.workspace.findFiles(foundedPath);
         for(let i = 0, index = 0; i < workspace.length; i++){
             if(workspace[i].fileName == foundedPath)
                 return workspace[i];
@@ -87,7 +88,7 @@ export class RobotDocUtil{
                     isInKeywordRange = false;
                 }
                 else{
-                    let match = line.text.match(/^(w+\s?)+$/);
+                    let match = line.text.match(/^(\w+\s?)+$/);
                     if(match){
                         keywords.push(match[1]);
                     }
