@@ -11,7 +11,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onLanguage:robotframework"
     ],
     "main": "./out/src/extension",
     "contributes": {
