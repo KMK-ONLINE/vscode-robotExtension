@@ -1,65 +1,39 @@
 # robotf-extension README
 
-This is the README for your extension "robotf-extension". After writing up a brief description, we recommend including the following sections.
+This is visual studio extension for robot framework. this extension is still in its early stage.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+![Keyword Autocomplete](smart-keyword-autocomplete.png)
+* Keyword Autocomplete
+    * it scans all the included resources and search for its keywords
+    * it will suggest common keywords from BuiltIn, Selenium2Library, ExtendedSelenium2Library, and more
 
-For example if there is an image subfolder under your extension project workspace:
+![Resource Autocomplete](smart-resource-autocomplete.png)
+* Resource Autocomplete
+    * it scans nearest resources
 
-\!\[feature X\]\(images/feature-x.png\)
+![Variable Autocomplete](smart-variable-autocomplete.png)
+* Variable Autocomplete
+    * it scans all the included resources and search for its global variables
+    * it scans all variables from local files
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![Language Autocomplete](builtin-grammar-autocomplete.png)
+* Language Autocomplete
+
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+You need to have robotframework language support for visual studio code
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Performance issues when handle more than 350++ files in workspace
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+Initial release
 
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release of robot framework extension
