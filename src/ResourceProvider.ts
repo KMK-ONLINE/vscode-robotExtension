@@ -7,6 +7,16 @@ import {Util} from './Util';
 
 export class ResourceProvider{
     
+    public static getResourceByName(resourceName:string, document:vscode.TextDocument):File{
+        let files = ResourceProvider.allIncludedResources(document);
+        files.push(new File(document.fileName));
+        for(let i = 0; i < files.length; i++){
+            if(resourceName == files[i].fileNameWithNoExtension){
+                return files[i];
+            }
+        }
+    }
+
     public static allNearestResources(document:vscode.TextDocument):File[]{
         let allFilesPath = ResourceProvider.allNearestResourcesPath(document);
         let allFiles:File[] = [];
