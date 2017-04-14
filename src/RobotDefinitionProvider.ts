@@ -19,17 +19,27 @@ export class RobotDefinitionProvider implements vscode.DefinitionProvider{
                 return RobotDefinitionProvider.includedKeywordDefinition(document, key[0], key[1]);
             }
             else{
-                return RobotDefinitionProvider.localKeywordDefinition(document, key[0]);
+                return RobotDefinitionProvider.keywordDefinition(document, key[0]);
             }
         }
         return null;
     }
 
-    private static localKeywordDefinition(document: vscode.TextDocument, keyword:string):vscode.ProviderResult<vscode.Definition>{
+    private static keywordDefinition(document: vscode.TextDocument, keyword:string):vscode.ProviderResult<vscode.Definition>{
         let result;
         try{
-            let lineNumber = KeywordProvider.getKeywordPosition(new File(document.fileName), keyword);
-            result = new vscode.Location(vscode.Uri.file(document.fileName), new vscode.Position(lineNumber, 0));
+            let resources = ResourceProvider.allIncludedResources(document);
+            resources.push(new File(document.fileName));
+            let resource:string;
+            let lineNumber:number;
+            for(let i = 0; i < resources.length; i++){
+                lineNumber = KeywordProvider.getKeywordPosition(resources[i], keyword);
+                if(lineNumber > 0){
+                    resource = resources[i].path;
+                    break;
+                }
+            }
+            result = new vscode.Location(vscode.Uri.file(resource), new vscode.Position(lineNumber, 0));
         }
         catch(e){
             console.log(e);

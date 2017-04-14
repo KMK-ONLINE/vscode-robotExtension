@@ -43,7 +43,7 @@ export class KeywordProvider{
                 }
             }
         }
-        return 0;
+        return -1;
     }
 
     public static allIncludedKeywordsSearcher(files:File[]):string[]{
