@@ -2,7 +2,7 @@
     "name": "robotf-extension",
     "displayName": "RobotF Extension",
     "description": "Autocomplete for robot framework",
-    "version": "1.0.2",
+    "version": "1.0.5",
     "publisher": "nayanda",
     "engines": {
         "vscode": "^1.11.0"
@@ -38,5 +38,9 @@
         "mocha": "^2.3.3",
         "@types/node": "^6.0.40",
         "@types/mocha": "^2.2.32"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/KMK-ONLINE/vscode-robotExtension.git"
     }
 }
