@@ -37,3 +37,7 @@ Initial release
 ### 1.0.0
 
 Initial release of robot framework extension
+
+### 1.1.0
+
+Added definition provider
