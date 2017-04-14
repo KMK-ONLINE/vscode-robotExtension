@@ -9,20 +9,27 @@ export class VariableCompletionProvider implements vscode.CompletionItemProvider
 
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[]{
         let line = document.lineAt(position);
-        let included = ResourceProvider.allIncludedResources(document);
-        let allVariablesNames = VariableCompletionProvider.allAvailableVariables(document, included);      
-        let suggestionsString:string[];
         let matcher1 = line.text.match(/\$\{(\w*\s*[-_]*)\}/);
         let matcher2 = line.text.match(/(\$\{?(\w*\s*[-_]*))(\s+|$)/);
         if(matcher1){
-            suggestionsString = Util.sentenceLikelyAnalyzer(matcher1[1], allVariablesNames);
+            return Promise.resolve(Util.stringArrayToCompletionItems(VariableCompletionProvider.getVariablesNames(document, matcher1[1])));
         }
         else if(matcher2){
-            let allVariables = VariableCompletionProvider.variablesFormatter(allVariablesNames);
-            suggestionsString = Util.sentenceLikelyAnalyzer(matcher2[1], allVariables);
+            return Promise.resolve(Util.stringArrayToCompletionItems(VariableCompletionProvider.getVariables(document, matcher2[1])));
         }
-        return Util.stringArrayToCompletionItems(suggestionsString);
+    }
 
+    private static getVariablesNames(document:vscode.TextDocument, match:string):string[]{
+        let included = ResourceProvider.allIncludedResources(document);
+        let allVariablesNames = VariableCompletionProvider.allAvailableVariables(document, included);      
+        let suggestionsString = Util.sentenceLikelyAnalyzer(match, allVariablesNames);
+        return suggestionsString;
+    }
+
+    private static getVariables(document:vscode.TextDocument, match:string):string[]{
+        let allVariablesNames = VariableCompletionProvider.getVariablesNames(document, match);
+        let allVariables = VariableCompletionProvider.variablesFormatter(allVariablesNames);
+        return allVariables;
     }
 
     private static allAvailableVariables(document:vscode.TextDocument, included:File[]):string[]{

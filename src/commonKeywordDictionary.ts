@@ -1,4 +1,4 @@
-export var commonKeywords = [
+export var COMMON_KEYWORDS = [
 	"Add Cookie",
 	"Add Location Strategy",
 	"Alert Should Be Present",
