@@ -5,6 +5,7 @@ import {ResourceProvider} from './ResourceProvider';
 import {KeywordProvider} from './KeywordProvider';
 import {File} from './File';
 import {Util} from './Util';
+import {commonKeywords} from './commonKeywordDictionary';
 
 export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 	
@@ -36,6 +37,7 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 		let localKeywords = KeywordProvider.vscodeKeywordSearcher(document)
 		let includedKeywords = KeywordProvider.allIncludedKeywordsSearcher(included);
 		let allKeywords = localKeywords.concat(includedKeywords);
+		allKeywords = allKeywords.concat(commonKeywords);
 		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, allKeywords);
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
@@ -43,6 +45,7 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 	private resourceCompleter(document: vscode.TextDocument, path:string):vscode.CompletionItem[]{
 		let resources = ResourceProvider.allNearestResourcesPath(document);
 		let resourceRelativePath = ResourceProvider.resourcesFormatter(document, "", resources);
+		resourceRelativePath = resourceRelativePath.concat(commonKeywords);
 		let suggestionsString = Util.sentenceLikelyAnalyzer(path, resourceRelativePath);
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
@@ -50,6 +53,7 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 	private resourceMatcher(document: vscode.TextDocument, fileName:string):vscode.CompletionItem[]{
 		let resources = ResourceProvider.allNearestResourcesPath(document);
 		let includesFormat = ResourceProvider.autoResourcesFormatter(document, resources);
+		includesFormat = includesFormat.concat(commonKeywords);
 		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, includesFormat);
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
