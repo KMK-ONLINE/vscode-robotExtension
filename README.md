@@ -4,23 +4,27 @@ This is visual studio extension for robot framework. this extension is still in 
 
 ## Features
 
-![Keyword Autocomplete](smart-keyword-autocomplete.png)
 * Keyword Autocomplete
     * it scans all the included resources and search for its keywords
     * it will suggest common keywords from BuiltIn, Selenium2Library, ExtendedSelenium2Library, and more
+![Keyword Autocomplete](smart-keyword-autocomplete.png)
 
-![Resource Autocomplete](smart-resource-autocomplete.png)
 * Resource Autocomplete
     * it scans nearest resources
+![Resource Autocomplete](smart-resource-autocomplete.png)
 
-![Variable Autocomplete](smart-variable-autocomplete.png)
 * Variable Autocomplete
     * it scans all the included resources and search for its global variables
     * it scans all variables from local files
+![Variable Autocomplete](smart-variable-autocomplete.png)
 
-![Language Autocomplete](builtin-grammar-autocomplete.png)
 * Language Autocomplete
+![Language Autocomplete](builtin-grammar-autocomplete.png)
 
+* Keyword Definition
+    * Show the original keyword location
+    * ctrl + click to the keyword will bring you to the original keyword location
+![Variable Definition](keyword-definition.png)
 
 ## Requirements
 
