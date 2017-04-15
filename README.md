@@ -24,7 +24,7 @@ This is visual studio extension for robot framework. this extension is still in 
 * Keyword Definition
     * Show the original keyword location
     * ctrl + click to the keyword will bring you to the original keyword location
-![Variable Definition](keyword-definition.png)
+![Keyword Definition](keyword-definition.png)
 
 ## Requirements
 
