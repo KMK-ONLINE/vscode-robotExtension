@@ -1,7 +1,7 @@
 {
     "name": "robotf-extension",
     "displayName": "RobotF Extension",
-    "description": "Autocomplete for robot framework",
+    "description": "Extension for robot framework",
     "version": "1.1.5",
     "publisher": "kmk-labs",
     "engines": {
