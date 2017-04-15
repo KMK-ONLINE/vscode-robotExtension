@@ -6,6 +6,10 @@ import {KeywordProvider} from './KeywordProvider';
 import {File} from './File';
 import {Util} from './Util';
 
+var SYNTAX = [
+	"Documentation", "Library", "Resouce"
+]
+
 export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 	
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[]{
@@ -27,7 +31,7 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 			return Promise.resolve<vscode.CompletionItem[]>(this.keywordMatcher(document, keywordMatcher2[1]));
 		}
 		else{
-			return [];
+			return  Util.stringArrayToCompletionItems(SYNTAX);
 		}
 	}
 
