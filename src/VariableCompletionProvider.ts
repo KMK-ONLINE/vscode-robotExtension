@@ -22,13 +22,13 @@ export class VariableCompletionProvider implements vscode.CompletionItemProvider
     private static getVariablesNames(document:vscode.TextDocument, match:string):string[]{
         let included = ResourceProvider.allIncludedResources(document);
         let allVariablesNames = VariableCompletionProvider.allAvailableVariables(document, included);      
-        let suggestionsString = Util.sentenceLikelyAnalyzer(match, allVariablesNames);
+        let suggestionsString = Util.sentenceLikelyAnalyzer(match, Array.from(new Set(allVariablesNames)));
         return suggestionsString;
     }
 
     private static getVariables(document:vscode.TextDocument, match:string):string[]{
         let allVariablesNames = VariableCompletionProvider.getVariablesNames(document, match);
-        let allVariables = VariableCompletionProvider.variablesFormatter(allVariablesNames);
+        let allVariables = VariableCompletionProvider.variablesFormatter(Array.from(new Set(allVariablesNames)));
         return allVariables;
     }
 

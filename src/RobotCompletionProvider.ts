@@ -37,21 +37,21 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 		let includedKeywords = KeywordProvider.allIncludedKeywordsSearcher(included);
 		let libKeywords = KeywordProvider.getKeywordLibrary(included.concat(new File(document.fileName)));
 		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
-		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, allKeywords);
+		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, Array.from(new Set(allKeywords)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
 
 	private resourceCompleter(document: vscode.TextDocument, path:string):vscode.CompletionItem[]{
 		let resources = ResourceProvider.allNearestResourcesPath(document);
 		let resourceRelativePath = ResourceProvider.resourcesFormatter(document, "", resources);
-		let suggestionsString = Util.sentenceLikelyAnalyzer(path, resourceRelativePath);
+		let suggestionsString = Util.sentenceLikelyAnalyzer(path, Array.from(new Set(resourceRelativePath)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
 
 	private resourceMatcher(document: vscode.TextDocument, fileName:string):vscode.CompletionItem[]{
 		let resources = ResourceProvider.allNearestResourcesPath(document);
 		let includesFormat = ResourceProvider.autoResourcesFormatter(document, resources);
-		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, includesFormat);
+		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, Array.from(new Set(includesFormat)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
 
