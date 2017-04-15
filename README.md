@@ -42,7 +42,7 @@ Performance issues when handle more than 350++ files in workspace
 ## For Contributors
 
 You can added new library with its keywords at src/commonKeywordDictionary.ts with format:
-```
+``` typescript
 export var LIB =
 	[
         //your new library is here
