@@ -15,7 +15,7 @@ export class VariableCompletionProvider implements vscode.CompletionItemProvider
             return Promise.resolve(Util.stringArrayToCompletionItems(VariableCompletionProvider.getVariablesNames(document, matcher1[1])));
         }
         else if(matcher2){
-            return Promise.resolve(Util.stringArrayToCompletionItems(VariableCompletionProvider.getVariables(document, matcher2[1])));
+            return Promise.resolve(Util.stringArrayToCompletionItems(VariableCompletionProvider.getVariables(document, matcher2[2])));
         }
     }
 
