@@ -39,6 +39,22 @@ You need to have robotframework language support for visual studio code
 
 Performance issues when handle more than 350++ files in workspace
 
+## For Contributors
+
+You can added new library with its keywords at src/commonKeywordDictionary.ts with format:
+```
+export var LIB =
+	[
+        //your new library is here
+		{
+			name: "libraryName" //name must be correct,
+			key: [ "keyword1", "keyword2" ]
+        },
+        ...
+    ]
+    
+```
+
 ## Release Notes
 
 Initial release
