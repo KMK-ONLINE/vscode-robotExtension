@@ -47,7 +47,7 @@ export var LIB =
 	[
         //your new library is here
 		{
-			name: "libraryName" //name must be correct,
+			name: "libraryName", //name must be correct
 			key: [ "keyword1", "keyword2" ]
         },
         ...
