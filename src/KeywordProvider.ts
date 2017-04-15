@@ -2,8 +2,40 @@
 
 import vscode = require('vscode');
 import {File} from './File';
+import {LIB} from './commonKeywordDictionary'
 
 export class KeywordProvider{
+
+    public static getKeywordLibrary(included:File[]):string[]{
+        let allLibs:Set<string> = new Set();
+        for(let i = 0; i < included.length; i++){
+            let libs = KeywordProvider.includedLibrarySearcher(included[i]);
+            for(let j = 0; j < libs.length; j++){
+                allLibs.add(libs[j]);
+            }
+        }
+        let arrLibs = Array.from(allLibs);
+        let keywords:string[] = [];
+        for(let i = 0; i < arrLibs.length; i++){
+            for(let j = 0; j < LIB.length; j++){
+                if(LIB[j].name == arrLibs[i]){
+                    keywords = keywords.concat(LIB[j].key);
+                }
+            }
+        }
+        return keywords;
+    }
+
+    private static includedLibrarySearcher(file:File):string[]{
+        let libs:string[] = [];
+        for(let i = 0; i < file.lineCount; i++){
+            let match = file.lineAt(i).match(/^Library\s+(\w+)/);
+            if(match){
+                libs.push(match[1]);
+            }
+        }
+        return libs;
+    }
 
     public static getKeywordByPosition(document:vscode.TextDocument, position:vscode.Position):string[]{
         let line = document.lineAt(position.line).text;

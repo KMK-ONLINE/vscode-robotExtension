@@ -5,7 +5,6 @@ import {ResourceProvider} from './ResourceProvider';
 import {KeywordProvider} from './KeywordProvider';
 import {File} from './File';
 import {Util} from './Util';
-import {COMMON_KEYWORDS} from './commonKeywordDictionary';
 
 export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 	
@@ -36,8 +35,8 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider{
 		let included = ResourceProvider.allIncludedResources(document);
 		let localKeywords = KeywordProvider.vscodeKeywordSearcher(document)
 		let includedKeywords = KeywordProvider.allIncludedKeywordsSearcher(included);
-		let allKeywords = localKeywords.concat(includedKeywords);
-		allKeywords = allKeywords.concat(COMMON_KEYWORDS);
+		let libKeywords = KeywordProvider.getKeywordLibrary(included.concat(new File(document.fileName)));
+		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
 		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, allKeywords);
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
