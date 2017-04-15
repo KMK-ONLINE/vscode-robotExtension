@@ -1,24 +1,24 @@
 'use strict';
 
 import vscode = require('vscode');
-import {File} from './File';
-import {LIB} from './commonKeywordDictionary'
+import { File } from './File';
+import { LIB } from './commonKeywordDictionary'
 
-export class KeywordProvider{
+export class KeywordProvider {
 
-    public static getKeywordLibrary(included:File[]):string[]{
-        let allLibs:Set<string> = new Set();
-        for(let i = 0; i < included.length; i++){
+    public static getKeywordLibrary(included: File[]): string[] {
+        let allLibs: Set<string> = new Set();
+        for (let i = 0; i < included.length; i++) {
             let libs = KeywordProvider.includedLibrarySearcher(included[i]);
-            for(let j = 0; j < libs.length; j++){
+            for (let j = 0; j < libs.length; j++) {
                 allLibs.add(libs[j]);
             }
         }
         let arrLibs = Array.from(allLibs);
-        let keywords:string[] = [];
-        for(let i = 0; i < arrLibs.length; i++){
-            for(let j = 0; j < LIB.length; j++){
-                if(LIB[j].name == arrLibs[i]){
+        let keywords: string[] = [];
+        for (let i = 0; i < arrLibs.length; i++) {
+            for (let j = 0; j < LIB.length; j++) {
+                if (LIB[j].name == arrLibs[i]) {
                     keywords = keywords.concat(LIB[j].key);
                 }
             }
@@ -26,51 +26,51 @@ export class KeywordProvider{
         return keywords;
     }
 
-    private static includedLibrarySearcher(file:File):string[]{
-        let libs:string[] = [];
-        for(let i = 0; i < file.lineCount; i++){
+    private static includedLibrarySearcher(file: File): string[] {
+        let libs: string[] = [];
+        for (let i = 0; i < file.lineCount; i++) {
             let match = file.lineAt(i).match(/^Library\s+(\w+)/);
-            if(match){
+            if (match) {
                 libs.push(match[1]);
             }
         }
         return libs;
     }
 
-    public static getKeywordByPosition(document:vscode.TextDocument, position:vscode.Position):string[]{
+    public static getKeywordByPosition(document: vscode.TextDocument, position: vscode.Position): string[] {
         let line = document.lineAt(position.line).text;
-        let whiteSpace:number = 0;
-        let index:number = 0;
-        for(let i = position.character; i >= 0; i--){
-            if(/\s/.test(line.charAt(i))){
+        let whiteSpace: number = 0;
+        let index: number = 0;
+        for (let i = position.character; i >= 0; i--) {
+            if (/\s/.test(line.charAt(i))) {
                 whiteSpace++;
-                if(whiteSpace == 2){
+                if (whiteSpace == 2) {
                     index = i + 2;
                     break;
                 }
             }
-            else{
+            else {
                 whiteSpace = 0;
             }
         }
         line = line.substr(index);
         let match1 = line.match(/^(([-_]*\w+)+)\.((\w+\s?)+)/);
         let match2 = line.match(/^((\w+\s?)+)\s{2,}/);
-        if(match1){
+        if (match1) {
             return [match1[1], match1[3].replace(/\s+$/, "")];
         }
-        else if(match2){
+        else if (match2) {
             return [match2[1].replace(/\s+$/, "")];
         }
-        else{
+        else {
             return null;
         }
     }
 
-    public static getKeywordPosition(file:File, keyword:string):number{
-        for(let i = 0; i < file.lineCount; i++){
-            if(/^([-_]*\w+\s?)+/.test(file.lineAt(i))){
-                if(file.lineAt(i).includes(keyword)){
+    public static getKeywordPosition(file: File, keyword: string): number {
+        for (let i = 0; i < file.lineCount; i++) {
+            if (/^([-_]*\w+\s?)+/.test(file.lineAt(i))) {
+                if (file.lineAt(i).includes(keyword)) {
                     return i;
                 }
             }
@@ -78,12 +78,12 @@ export class KeywordProvider{
         return -1;
     }
 
-    public static allIncludedKeywordsSearcher(files:File[]):string[]{
-        let keywords:string[] = [];
-        for(let i = 0; i < files.length; i++){
+    public static allIncludedKeywordsSearcher(files: File[]): string[] {
+        let keywords: string[] = [];
+        for (let i = 0; i < files.length; i++) {
             keywords.push(files[i].fileNameWithNoExtension);
             let fileKeywords = KeywordProvider.keywordSearcher(files[i]);
-            if(fileKeywords.length > 0){
+            if (fileKeywords.length > 0) {
                 let fileAndKeywords = KeywordProvider.fileAndKeywordsMerger(files[i], fileKeywords);
                 keywords = keywords.concat(fileAndKeywords);
             }
@@ -91,25 +91,25 @@ export class KeywordProvider{
         return keywords;
     }
 
-    public static vscodeKeywordSearcher(file:vscode.TextDocument):string[]{
+    public static vscodeKeywordSearcher(file: vscode.TextDocument): string[] {
         return KeywordProvider.keywordSearcher(new File(file.fileName));
     }
 
-    public static keywordSearcher(file:File):string[]{
-        let keywords:string[] = [];
+    public static keywordSearcher(file: File): string[] {
+        let keywords: string[] = [];
         let isInKeywordRange = false;
-        for(let i = 0; i < file.lineCount; i++){
+        for (let i = 0; i < file.lineCount; i++) {
             let line = file.lineAt(i);
-            if(!isInKeywordRange){
+            if (!isInKeywordRange) {
                 isInKeywordRange = /^\*\*\*+\sKeywords\s\*\*\*/.test(line)
             }
-            else{
-                if(/^\*\*\*+\s[\w+\s?]+\s\*\*\*/.test(line)){
+            else {
+                if (/^\*\*\*+\s[\w+\s?]+\s\*\*\*/.test(line)) {
                     isInKeywordRange = false;
                 }
-                else{
+                else {
                     let match = line.match(/^((\w+\s?)+)$/);
-                    if(match){
+                    if (match) {
                         keywords.push(match[1]);
                     }
                 }
@@ -119,12 +119,12 @@ export class KeywordProvider{
         return keywords;
     }
 
-    public static fileAndKeywordsMerger(file:File, keywords:string[]):string[]{
-		let merges:string[] = [];
-		let fileName = file.fileNameWithNoExtension;
-		for(let i = 0; i < keywords.length; i++){
-			merges.push(fileName + "." + keywords[i]);
-		}
-		return merges;
-	}
+    public static fileAndKeywordsMerger(file: File, keywords: string[]): string[] {
+        let merges: string[] = [];
+        let fileName = file.fileNameWithNoExtension;
+        for (let i = 0; i < keywords.length; i++) {
+            merges.push(fileName + "." + keywords[i]);
+        }
+        return merges;
+    }
 }
