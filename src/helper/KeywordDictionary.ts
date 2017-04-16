@@ -1,3 +1,11 @@
+export var SYNTAX = [
+	"Documentation", "Library", "Resouce", "sizzle=", "css=",
+	"dom=", "return", "id=", "identifier=", "name=", "xpath=",
+	"link=", "partial link=", "jquery=", "tag=", "default=",
+	"text=", "timeout=", "message=", "loglevel=", "persist=",
+	"True", "False"
+];
+
 export var LIB =
 	[
 		{

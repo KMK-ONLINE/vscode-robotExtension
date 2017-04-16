@@ -5,10 +5,7 @@ import vscode = require('vscode');
 import { ResourceHelper } from '../../helper/ResourceHelper';
 import { KeywordHelper } from '../../helper/KeywordHelper';
 import { Util } from '../../Util';
-
-var SYNTAX = [
-	"Documentation", "Library", "Resouce"
-];
+import { SYNTAX } from '../../helper/KeywordDictionary';
 
 export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 
@@ -20,43 +17,43 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 		let resourceMatcher1 = line.text.match(/^([rR][eE]?[sS]?[oO]?[uU]?[rR]?[cC]?[eE]?)$/);
 		let resourceMatcher2 = line.text.match(/^Resource\s{2,}(\.?\.?\S*)/);
 		if (resourceMatcher1) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.resourceMatcher(document, resourceMatcher1[0]));
+			return Promise.resolve<vscode.CompletionItem[]>(this.matchResource(document, resourceMatcher1[0]));
 		}
 		else if (resourceMatcher2) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.resourceCompleter(document, resourceMatcher2[1]));
+			return Promise.resolve<vscode.CompletionItem[]>(this.completeResource(document, resourceMatcher2[1]));
 		}
 		else if (keywordMatcher1) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.keywordMatcher(document, keywordMatcher1[1]));
+			return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keywordMatcher1[1]));
 		}
 		else if (keywordMatcher2) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.keywordMatcher(document, keywordMatcher2[1]));
+			return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keywordMatcher2[1]));
 		}
 		else {
 			return Util.stringArrayToCompletionItems(SYNTAX);
 		}
 	}
 
-	private keywordMatcher(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
+	private matchKeyword(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
 		let included = ResourceHelper.allIncludedResources(document);
-		let localKeywords = KeywordHelper.keywordSearcher(document)
-		let includedKeywords = KeywordHelper.allIncludedKeywordsSearcher(included);
+		let localKeywords = KeywordHelper.searchKeyword(document)
+		let includedKeywords = KeywordHelper.searchAllIncludedKeyword(included);
 		let libKeywords = KeywordHelper.getKeywordLibrary(included.concat(document));
 		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
-		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, Array.from(new Set(allKeywords)));
+		let suggestionsString = Util.analyzeSentenceLikeliness(fileName, Array.from(new Set(allKeywords)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
 
-	private resourceCompleter(document: vscode.TextDocument, path: string): vscode.CompletionItem[] {
+	private completeResource(document: vscode.TextDocument, path: string): vscode.CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
-		let resourceRelativePath = ResourceHelper.resourcesFormatter(document, "", resources);
-		let suggestionsString = Util.sentenceLikelyAnalyzer(path, Array.from(new Set(resourceRelativePath)));
+		let resourceRelativePath = ResourceHelper.formatResources(document, "", resources);
+		let suggestionsString = Util.analyzeSentenceLikeliness(path, Array.from(new Set(resourceRelativePath)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
 
-	private resourceMatcher(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
+	private matchResource(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
-		let includesFormat = ResourceHelper.autoResourcesFormatter(document, resources);
-		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, Array.from(new Set(includesFormat)));
+		let includesFormat = ResourceHelper.autoFormatResources(document, resources);
+		let suggestionsString = Util.analyzeSentenceLikeliness(fileName, Array.from(new Set(includesFormat)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
 

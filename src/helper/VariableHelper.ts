@@ -1,30 +1,32 @@
+'use strict';
+
 import vscode = require('vscode');
 import { ResourceHelper } from './ResourceHelper';
 import { Util } from '../Util';
 
-export class VariableHelper{
+export class VariableHelper {
     public static getVariablesNames(document: vscode.TextDocument, match: string): string[] {
         let included = ResourceHelper.allIncludedResources(document);
         let allVariablesNames = VariableHelper.allAvailableVariables(document, included);
-        let suggestionsString = Util.sentenceLikelyAnalyzer(match, Array.from(new Set(allVariablesNames)));
+        let suggestionsString = Util.analyzeSentenceLikeliness(match, Array.from(new Set(allVariablesNames)));
         return suggestionsString;
     }
 
     public static getVariables(document: vscode.TextDocument, match: string): string[] {
         let allVariablesNames = VariableHelper.getVariablesNames(document, match);
-        let allVariables = VariableHelper.variablesFormatter(Array.from(new Set(allVariablesNames)));
+        let allVariables = VariableHelper.formatVariables(Array.from(new Set(allVariablesNames)));
         return allVariables;
     }
 
     public static allAvailableVariables(document: vscode.TextDocument, included: vscode.TextDocument[]): string[] {
-        let allVar = VariableHelper.allVariablesSearcher(document);
+        let allVar = VariableHelper.searchAllVariables(document);
         for (let i = 0; i < included.length; i++) {
-            allVar = allVar.concat(VariableHelper.globalVariablesSearcher(included[i]));
+            allVar = allVar.concat(VariableHelper.searchAllGlobalVariables(included[i]));
         }
         return allVar;
     }
 
-    public static globalVariablesSearcher(file: vscode.TextDocument): string[] {
+    public static searchAllGlobalVariables(file: vscode.TextDocument): string[] {
         let variables: Set<string> = new Set();
         let isInVarRange = false;
         for (let i = 0; i < file.lineCount; i++) {
@@ -54,7 +56,7 @@ export class VariableHelper{
         return Array.from(variables);
     }
 
-    public static allVariablesSearcher(file: vscode.TextDocument): string[] {
+    public static searchAllVariables(file: vscode.TextDocument): string[] {
         let variables: Set<string> = new Set();
         for (let i = 0; i < file.lineCount; i++) {
             let line = file.lineAt(i).text;
@@ -66,7 +68,7 @@ export class VariableHelper{
         return Array.from(variables);
     }
 
-    public static variablesFormatter(varNames: string[]): string[] {
+    public static formatVariables(varNames: string[]): string[] {
         let varFormat: string[] = [];
         for (let i = 0; i < varNames.length; i++) {
             varFormat.push("${" + varNames[i] + "}");
