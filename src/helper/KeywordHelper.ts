@@ -54,17 +54,30 @@ export class KeywordHelper {
         for (let i = 0; i < refference.length; i++) {
             for (let j = 0; j < refference[i].lineCount; j++) {
                 let line = refference[i].lineAt(j).text;
-                let found = line.indexOf(keyword, 0);
-                if (found >= 0) {
-                    let indexes: number[] = [];
-                    do {
-                        let start = found + keyLength;
-                        let range = new vscode.Range(new vscode.Position(j, found), new vscode.Position(j, start));
-                        locations.push(new vscode.Location(refference[i].uri, range))
-                        found = line.indexOf(keyword, start);
-                    } while (found >= 0);
+                let match = line.match(/^(([-_]*\w+\s?)+)\s*$/);
+                if (match != null) {
+                    if (match[1].replace(/\s+$/, '') == keyword) {
+                        locations.push(new vscode.Location(refference[i].uri, new vscode.Range(new vscode.Position(j, 0), new vscode.Position(j, keyLength))));
+                    }
                 }
-
+                else {
+                    let found = line.indexOf(keyword);
+                    if (found >= 0) {
+                        let keys = KeywordHelper.getKeywordByPosition(refference[i], new vscode.Position(j, found))
+                        if (keys.length == 1) {
+                            let key = keys[0];
+                            if (key == keyword) {
+                                locations.push(new vscode.Location(refference[i].uri, new vscode.Range(new vscode.Position(j, found), new vscode.Position(j, found + keyLength))));
+                            }
+                        }
+                        else {
+                            let key = keys[1];
+                            if (key == keyword) {
+                                locations.push(new vscode.Location(refference[i].uri, new vscode.Range(new vscode.Position(j, found), new vscode.Position(j, found + keyLength - 1))));
+                            }
+                        }
+                    }
+                }
             }
         }
         return locations;
@@ -138,9 +151,10 @@ export class KeywordHelper {
 
     public static getKeywordDeclarationPosition(file: vscode.TextDocument, keyword: string): vscode.Range {
         for (let i = 0; i < file.lineCount; i++) {
-            if (/^([-_]*\w+\s?)+/.test(file.lineAt(i).text)) {
-                if (file.lineAt(i).text.includes(keyword)) {
-                    return new vscode.Range(new vscode.Position(i, 0), new vscode.Position(i, keyword.length - 1));
+            if (/^([-_]*\w+\s?)+\s*$/.test(file.lineAt(i).text)) {
+                let match = file.lineAt(i).text.match(/^(([-_]*\w+\s?)+)\s*$/)
+                if (match[1].replace(/\s+$/, "") == keyword) {
+                    return new vscode.Range(new vscode.Position(i, 0), new vscode.Position(i, keyword.length));
                 }
             }
         }

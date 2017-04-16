@@ -4,6 +4,7 @@ import { WorkspaceContext } from '../../WorkspaceContext';
 import vscode = require('vscode');
 import { KeywordHelper } from '../../helper/KeywordHelper';
 import { ResourceHelper } from '../../helper/ResourceHelper';
+import cp = require('child_process');
 
 export class RobotRenameProvider implements vscode.RenameProvider {
     public provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.WorkspaceEdit> {
@@ -21,15 +22,14 @@ export class RobotRenameProvider implements vscode.RenameProvider {
         else {
             return null;
         }
-        return Promise.resolve(RobotRenameProvider.renameKeyword(keywordOrigin, key, newName));
-    }
-
-    private static renameKeyword(keywordOrigin: vscode.Location, keyword: string, newName: string): vscode.WorkspaceEdit {
-        let allLocation = KeywordHelper.getAllKeywordReferences(WorkspaceContext.getDocumentByUri(keywordOrigin.uri), keyword);
-        let editor = new vscode.WorkspaceEdit();
-        allLocation.forEach((location) => {
-            editor.replace(location.uri, location.range, newName);
+        return Promise.resolve().then(() => {
+            let allLocation = KeywordHelper.getAllKeywordReferences(WorkspaceContext.getDocumentByUri(keywordOrigin.uri), key);
+            let editor = new vscode.WorkspaceEdit();
+            for (let i = 0; i < allLocation.length; i++) {
+                let location = allLocation[i];
+                editor.replace(location.uri, location.range, newName);
+            }
+            return editor;
         });
-        return editor;
     }
 }

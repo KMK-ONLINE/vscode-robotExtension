@@ -16,6 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('robot', new RobotCompletionProvider()));
 	context.subscriptions.push(vscode.languages.registerDefinitionProvider('robot', new RobotDefinitionProvider()));
 	context.subscriptions.push(vscode.languages.registerRenameProvider('robot', new RobotRenameProvider()));
+	context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(WorkspaceContext.scanWorkspace));
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(WorkspaceContext.scanWorkspace));
 }
 
 export function deactivate() {

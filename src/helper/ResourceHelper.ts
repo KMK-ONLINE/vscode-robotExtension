@@ -35,15 +35,14 @@ export class ResourceHelper {
 
     public static allIncludedResources(document: vscode.TextDocument): vscode.TextDocument[] {
         let included = ResourceHelper.searchResource(document);
-        let temp: vscode.TextDocument[][] = [];
         let length = included.length;
         for (let i = 0; i < length; i++) {
-            temp.push(ResourceHelper.searchResource(included[i]));
-            if (temp[i] != null) {
-                for (let j = 0; j < temp[i].length; j++) {
+            let temp = ResourceHelper.searchResource(included[i])
+            if (temp != null) {
+                for (let j = 0; j < temp.length; j++) {
                     let indirectInclude: vscode.TextDocument[];
-                    included.push(temp[i][j]);
-                    indirectInclude = ResourceHelper.searchResource(temp[i][j]);
+                    included.push(temp[j]);
+                    indirectInclude = ResourceHelper.searchResource(temp[j]);
                     if (indirectInclude != null) {
                         for (let k = 0; k < indirectInclude.length; k++) {
                             included.push(indirectInclude[k]);

@@ -7,7 +7,7 @@ export class WorkspaceContext {
 
     private static allDoc: vscode.TextDocument[] = [];
     private static allPath: string[] = [];
-    private static asyncReadingCounter: number;
+    private static asyncReadingCounter: number = 0;
     private static temp: vscode.TextDocument[];
 
     public static getAllDocuments(): vscode.TextDocument[] {
@@ -40,9 +40,9 @@ export class WorkspaceContext {
     }
 
     public static scanWorkspace() {
-        if (!WorkspaceContext.asyncReadingCounter) {
+        if (WorkspaceContext.asyncReadingCounter == 0) {
             WorkspaceContext.asyncReadingCounter = 1;
-            let scanner = new Promise((resolve, reject) => {
+            let scanner = Promise.resolve().then(() => {
                 console.log("scanning all .robot and .txt path");
                 WorkspaceContext.allPath = WorkspaceContext.getAllDirAndDocPath([vscode.workspace.rootPath]);
                 WorkspaceContext.temp = [];

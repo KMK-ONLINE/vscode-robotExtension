@@ -10,23 +10,22 @@ import { SYNTAX } from '../../helper/KeywordDictionary';
 export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[] {
-		WorkspaceContext.scanWorkspace();
 		let line = document.lineAt(position);
 		let keyword = KeywordHelper.getKeywordByPosition(document, position);
 		let resourceMatcher1 = line.text.match(/^([rR][eE]?[sS]?[oO]?[uU]?[rR]?[cC]?[eE]?)$/);
 		let resourceMatcher2 = line.text.match(/^Resource\s{2,}(\.?\.?\S*)/);
 		if (resourceMatcher1) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.matchResource(document, resourceMatcher1[0]));
+			return this.matchResource(document, resourceMatcher1[0]);
 		}
 		else if (resourceMatcher2) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.completeResource(document, resourceMatcher2[1]));
+			return this.completeResource(document, resourceMatcher2[1]);
 		}
 		else if (keyword != null) {
-			if(keyword.length == 1){
-				return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keyword[0]));
+			if (keyword.length == 1) {
+				return this.matchKeyword(document, keyword[0]);
 			}
-			else{
-				return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keyword[1]));
+			else {
+				return this.matchKeyword(document, keyword[1]);
 			}
 		}
 		else {
