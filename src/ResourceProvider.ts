@@ -1,64 +1,25 @@
 'use strict';
 
 import vscode = require('vscode');
-import fs = require('fs');
-import { File } from './File';
 import { Util } from './Util';
+import { WorkspaceContext } from './WorkspaceContext';
 
 export class ResourceProvider {
 
-    public static getResourceByName(resourceName: string, document: vscode.TextDocument): File {
+    public static getResourceByName(resourceName: string, document: vscode.TextDocument): vscode.TextDocument {
         let files = ResourceProvider.allIncludedResources(document);
-        files.push(new File(document.fileName));
+        files.push(document);
         for (let i = 0; i < files.length; i++) {
-            if (resourceName == files[i].fileNameWithNoExtension) {
+            if (resourceName == Util.extractFileNameWithNoExtension(files[i].fileName)) {
                 return files[i];
             }
         }
     }
 
-    public static allNearestResources(document: vscode.TextDocument): File[] {
-        let allFilesPath = ResourceProvider.allNearestResourcesPath(document);
-        let allFiles: File[] = [];
-        for (let i = 0; i < allFiles.length; i++) {
-            allFiles.push(new File(allFilesPath[i]));
-        }
-        return allFiles;
-    }
-
-
-    public static allNearestResourcesPath(document: vscode.TextDocument): string[] {
-        let folder = document.fileName.replace(/(\/|\\)([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "");
-        if (folder != vscode.workspace.rootPath + "\\") {
-            folder = folder.replace(/(\/|\\)([!"#%&'*+,.:<=>@_`~-]*|\w+)+$/, "");
-        }
-        let allFiles = ResourceProvider.getAllFiles([folder]);
-        return allFiles;
-    }
-
-    public static getAllFiles(paths: string[]): string[] {
-        let allFiles: string[] = [];
-        for (let i = 0; i < paths.length; i++) {
-            if (fs.lstatSync(paths[i]).isDirectory()) {
-                let directory = fs.readdirSync(paths[i] + "\\");
-                for (let j = 0; j < directory.length; j++) {
-                    directory[j] = paths[i] + "\\" + directory[j];
-                }
-                allFiles = allFiles.concat(ResourceProvider.getAllFiles(directory))
-            }
-            else if (fs.lstatSync(paths[i]).isFile()) {
-                if (/(\.robot|\.txt)$/.test(paths[i])) {
-                    allFiles.push(paths[i]);
-                }
-            }
-        }
-        return allFiles;
-    }
-
-    public static allIncludedResources(document: vscode.TextDocument): File[] {
-        let included = ResourceProvider.vscodeResourceSearcher(document);
-        let indirectInclude: File[] = [];
-        let temp: File[][] = [];
+    public static allIncludedResources(document: vscode.TextDocument): vscode.TextDocument[] {
+        let included = ResourceProvider.resourceSearcher(document);
+        let indirectInclude: vscode.TextDocument[] = [];
+        let temp: vscode.TextDocument[][] = [];
         let length = included.length;
         for (let i = 0; i < length; i++) {
             temp.push(ResourceProvider.resourceSearcher(included[i]));
@@ -71,15 +32,11 @@ export class ResourceProvider {
         return included;
     }
 
-    public static vscodeResourceSearcher(document: vscode.TextDocument): File[] {
-        return ResourceProvider.resourceSearcher(new File(document.fileName));
-    }
-
-    public static resourceSearcher(document: File): File[] {
+    public static resourceSearcher(document: vscode.TextDocument): vscode.TextDocument[] {
         let fileLength = document.lineCount;
-        let resources: File[] = [];
+        let resources: vscode.TextDocument[] = [];
         for (let i = 0; i < fileLength; i++) {
-            let line = document.lineAt(i);
+            let line = document.lineAt(i).text;
             let matches = line.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
             if (matches) {
                 let docs = ResourceProvider.documentSearcher(document, matches[1]);
@@ -89,7 +46,7 @@ export class ResourceProvider {
         return resources;
     }
 
-    public static searchFileByName(files: File[], fileName: string): File {
+    public static searchFileByName(files: vscode.TextDocument[], fileName: string): vscode.TextDocument {
         for (let i = 0; i < files.length; i++) {
             if (files[i].fileName == fileName) {
                 return files[i];
@@ -98,12 +55,12 @@ export class ResourceProvider {
         return null;
     }
 
-    public static documentSearcher(thisDocument: File, filePath: string): File {
-        return new File(ResourceProvider.pathSearcher(thisDocument, filePath));
+    public static documentSearcher(thisDocument: vscode.TextDocument, filePath: string): vscode.TextDocument {
+        return WorkspaceContext.getDocumentByPath(ResourceProvider.pathSearcher(thisDocument, filePath));
     }
 
-    public static pathSearcher(thisDocument: File, filePath: string): string {
-        let thisFolderPath = thisDocument.path.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "");
+    public static pathSearcher(thisDocument: vscode.TextDocument, filePath: string): string {
+        let thisFolderPath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "");
         while (/^\.\.\.?\//.test(filePath)) {
             filePath = filePath.replace(/^\.\.\.?\//, "");
             thisFolderPath = thisFolderPath.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+(\/|\\)$/, "");
@@ -111,15 +68,15 @@ export class ResourceProvider {
         return thisFolderPath + filePath;
     }
 
-    public static documentsToNames(documents: File[]): string[] {
+    public static documentsToNames(documents: vscode.TextDocument[]): string[] {
         let converted: string[] = [];
         for (let i = 0; i < documents.length; i++) {
-            converted[i] = documents[i].fileNameWithNoExtension;
+            converted[i] = Util.extractFileNameWithNoExtension(documents[i].fileName);
         }
         return converted;
     }
 
-    public static vscodeDocumentsToNames(documents: File[]): string[] {
+    public static vscodeDocumentsToNames(documents: vscode.TextDocument[]): string[] {
         let converted: string[] = [];
         for (let i = 0; i < documents.length; i++) {
             converted[i] = documents[i].fileName.match(/(([!"#%&'*+,.:<=>@_`~-]*|\w+)+)\.?\w*$/)[0].replace(/\.\w+$/, "");

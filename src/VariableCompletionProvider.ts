@@ -1,13 +1,14 @@
 'use strict';
 
 import vscode = require('vscode');
-import { File } from './File';
 import { ResourceProvider } from './ResourceProvider';
 import { Util } from './Util';
+import { WorkspaceContext } from './WorkspaceContext';
 
 export class VariableCompletionProvider implements vscode.CompletionItemProvider {
 
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[] {
+        WorkspaceContext.scanWorkspace();
         let line = document.lineAt(position);
         let matcher1 = line.text.match(/\$\{(\w*\s*[-_]*)\}/);
         let matcher2 = line.text.match(/(\$\{?(\w*\s*[-_]*))(\s+|$)/);
@@ -32,19 +33,19 @@ export class VariableCompletionProvider implements vscode.CompletionItemProvider
         return allVariables;
     }
 
-    private static allAvailableVariables(document: vscode.TextDocument, included: File[]): string[] {
-        let allVar = VariableCompletionProvider.allVariablesSearcher(new File(document.fileName));
+    private static allAvailableVariables(document: vscode.TextDocument, included: vscode.TextDocument[]): string[] {
+        let allVar = VariableCompletionProvider.allVariablesSearcher(document);
         for (let i = 0; i < included.length; i++) {
             allVar = allVar.concat(VariableCompletionProvider.globalVariablesSearcher(included[i]));
         }
         return allVar;
     }
 
-    private static globalVariablesSearcher(file: File): string[] {
+    private static globalVariablesSearcher(file: vscode.TextDocument): string[] {
         let variables: Set<string> = new Set();
         let isInVarRange = false;
         for (let i = 0; i < file.lineCount; i++) {
-            let line = file.lineAt(i);
+            let line = file.lineAt(i).text;
             if (!isInVarRange) {
                 let match = line.match(/Set Global Variable\s{2,}\$\{([-_.]*\w+\s*)\}/);
                 if (match) {
@@ -70,10 +71,10 @@ export class VariableCompletionProvider implements vscode.CompletionItemProvider
         return Array.from(variables);
     }
 
-    private static allVariablesSearcher(file: File): string[] {
+    private static allVariablesSearcher(file: vscode.TextDocument): string[] {
         let variables: Set<string> = new Set();
         for (let i = 0; i < file.lineCount; i++) {
-            let line = file.lineAt(i);
+            let line = file.lineAt(i).text;
             let match = line.match(/\$\{([-_.]*\w+\s*)\}/);
             if (match) {
                 variables.add(match[1]);

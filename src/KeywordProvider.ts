@@ -1,12 +1,12 @@
 'use strict';
 
 import vscode = require('vscode');
-import { File } from './File';
-import { LIB } from './commonKeywordDictionary'
+import { LIB } from './CommonKeywordDictionary';
+import { Util } from './Util';
 
 export class KeywordProvider {
 
-    public static getKeywordLibrary(included: File[]): string[] {
+    public static getKeywordLibrary(included: vscode.TextDocument[]): string[] {
         let allLibs: Set<string> = new Set();
         for (let i = 0; i < included.length; i++) {
             let libs = KeywordProvider.includedLibrarySearcher(included[i]);
@@ -26,10 +26,10 @@ export class KeywordProvider {
         return keywords;
     }
 
-    private static includedLibrarySearcher(file: File): string[] {
+    private static includedLibrarySearcher(file: vscode.TextDocument): string[] {
         let libs: string[] = [];
         for (let i = 0; i < file.lineCount; i++) {
-            let match = file.lineAt(i).match(/^Library\s+(\w+)/);
+            let match = file.lineAt(i).text.match(/^Library\s+(\w+)/);
             if (match) {
                 libs.push(match[1]);
             }
@@ -67,10 +67,10 @@ export class KeywordProvider {
         }
     }
 
-    public static getKeywordPosition(file: File, keyword: string): number {
+    public static getKeywordPosition(file: vscode.TextDocument, keyword: string): number {
         for (let i = 0; i < file.lineCount; i++) {
-            if (/^([-_]*\w+\s?)+/.test(file.lineAt(i))) {
-                if (file.lineAt(i).includes(keyword)) {
+            if (/^([-_]*\w+\s?)+/.test(file.lineAt(i).text)) {
+                if (file.lineAt(i).text.includes(keyword)) {
                     return i;
                 }
             }
@@ -78,10 +78,10 @@ export class KeywordProvider {
         return -1;
     }
 
-    public static allIncludedKeywordsSearcher(files: File[]): string[] {
+    public static allIncludedKeywordsSearcher(files: vscode.TextDocument[]): string[] {
         let keywords: string[] = [];
         for (let i = 0; i < files.length; i++) {
-            keywords.push(files[i].fileNameWithNoExtension);
+            keywords.push(Util.extractFileNameWithNoExtension(files[i].fileName));
             let fileKeywords = KeywordProvider.keywordSearcher(files[i]);
             if (fileKeywords.length > 0) {
                 let fileAndKeywords = KeywordProvider.fileAndKeywordsMerger(files[i], fileKeywords);
@@ -91,15 +91,11 @@ export class KeywordProvider {
         return keywords;
     }
 
-    public static vscodeKeywordSearcher(file: vscode.TextDocument): string[] {
-        return KeywordProvider.keywordSearcher(new File(file.fileName));
-    }
-
-    public static keywordSearcher(file: File): string[] {
+    public static keywordSearcher(file: vscode.TextDocument): string[] {
         let keywords: string[] = [];
         let isInKeywordRange = false;
         for (let i = 0; i < file.lineCount; i++) {
-            let line = file.lineAt(i);
+            let line = file.lineAt(i).text;
             if (!isInKeywordRange) {
                 isInKeywordRange = /^\*\*\*+\sKeywords\s\*\*\*/.test(line)
             }
@@ -119,9 +115,9 @@ export class KeywordProvider {
         return keywords;
     }
 
-    public static fileAndKeywordsMerger(file: File, keywords: string[]): string[] {
+    public static fileAndKeywordsMerger(file: vscode.TextDocument, keywords: string[]): string[] {
         let merges: string[] = [];
-        let fileName = file.fileNameWithNoExtension;
+        let fileName = Util.extractFileNameWithNoExtension(file.fileName);
         for (let i = 0; i < keywords.length; i++) {
             merges.push(fileName + "." + keywords[i]);
         }

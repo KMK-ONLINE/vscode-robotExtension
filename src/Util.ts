@@ -2,6 +2,14 @@ import vscode = require('vscode');
 
 export class Util {
 
+    public static extractFileName(path : string): string {
+        return path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
+    };
+
+    public static extractFileNameWithNoExtension(path : string): string {
+        return Util.extractFileName(path).replace(/\.\w+$/, "");
+    }
+
     public static sameCharRemover(a: string, b: string): string[] {
         let size = 0;
         for (let i = 0; i < b.length; i++) {

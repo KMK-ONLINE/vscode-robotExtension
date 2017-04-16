@@ -3,12 +3,13 @@
 import vscode = require('vscode');
 import { ResourceProvider } from './ResourceProvider';
 import { KeywordProvider } from './KeywordProvider';
-import { File } from './File';
 import { Util } from './Util';
+import { WorkspaceContext } from './WorkspaceContext';
 
 export class RobotDefinitionProvider implements vscode.DefinitionProvider {
 
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Definition> {
+        WorkspaceContext.scanWorkspace();
         return Promise.resolve(RobotDefinitionProvider.definitionProvider(document, position));
     }
 
@@ -29,13 +30,13 @@ export class RobotDefinitionProvider implements vscode.DefinitionProvider {
         let result;
         try {
             let resources = ResourceProvider.allIncludedResources(document);
-            resources.push(new File(document.fileName));
+            resources.push(document);
             let resource: string;
             let lineNumber: number;
             for (let i = 0; i < resources.length; i++) {
                 lineNumber = KeywordProvider.getKeywordPosition(resources[i], keyword);
                 if (lineNumber > 0) {
-                    resource = resources[i].path;
+                    resource = resources[i].fileName;
                     break;
                 }
             }
@@ -54,7 +55,7 @@ export class RobotDefinitionProvider implements vscode.DefinitionProvider {
         try {
             let resource = ResourceProvider.getResourceByName(file, document);
             let lineNumber = KeywordProvider.getKeywordPosition(resource, keyword);
-            result = new vscode.Location(vscode.Uri.file(resource.path), new vscode.Position(lineNumber, 0));
+            result = new vscode.Location(vscode.Uri.file(resource.fileName), new vscode.Position(lineNumber, 0));
         }
         catch (e) {
             console.log(e);
