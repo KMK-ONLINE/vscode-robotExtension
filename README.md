@@ -11,7 +11,7 @@ This is visual studio extension for robot framework. this extension is still in 
 ![Keyword Autocomplete](smart-keyword-autocomplete.png)
 
 * Resource Autocomplete
-    * it scans nearest resources
+    * it scans all resources
 
 ![Resource Autocomplete](smart-resource-autocomplete.png)
 
