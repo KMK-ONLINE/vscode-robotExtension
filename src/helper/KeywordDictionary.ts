@@ -3,7 +3,7 @@ export var SYNTAX: string[] = [
 	"dom=", "return", "id=", "identifier=", "name=", "xpath=",
 	"link=", "partial link=", "jquery=", "tag=", "default=",
 	"text=", "timeout=", "message=", "loglevel=", "persist=",
-	"True", "False"
+	"True", "False", "Test Setup", "Test Teardown"
 ];
 
 export var LIB =
