@@ -1,4 +1,4 @@
-export var SYNTAX = [
+export var SYNTAX: string[] = [
 	"Documentation", "Library", "Resouce", "sizzle=", "css=",
 	"dom=", "return", "id=", "identifier=", "name=", "xpath=",
 	"link=", "partial link=", "jquery=", "tag=", "default=",

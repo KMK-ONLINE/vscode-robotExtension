@@ -12,8 +12,7 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[] {
 		WorkspaceContext.scanWorkspace();
 		let line = document.lineAt(position);
-		let keywordMatcher1 = line.text.match(/^\s+(((_|-)*|\w+)+)/);
-		let keywordMatcher2 = line.text.match(/^\s+.+\s{2,}(((_|-)*|\w+)+)/);
+		let keyword = KeywordHelper.getKeywordByPosition(document, position);
 		let resourceMatcher1 = line.text.match(/^([rR][eE]?[sS]?[oO]?[uU]?[rR]?[cC]?[eE]?)$/);
 		let resourceMatcher2 = line.text.match(/^Resource\s{2,}(\.?\.?\S*)/);
 		if (resourceMatcher1) {
@@ -22,11 +21,13 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 		else if (resourceMatcher2) {
 			return Promise.resolve<vscode.CompletionItem[]>(this.completeResource(document, resourceMatcher2[1]));
 		}
-		else if (keywordMatcher1) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keywordMatcher1[1]));
-		}
-		else if (keywordMatcher2) {
-			return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keywordMatcher2[1]));
+		else if (keyword != null) {
+			if(keyword.length == 1){
+				return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keyword[0]));
+			}
+			else{
+				return Promise.resolve<vscode.CompletionItem[]>(this.matchKeyword(document, keyword[1]));
+			}
 		}
 		else {
 			return Util.stringArrayToCompletionItems(SYNTAX);
@@ -38,7 +39,7 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 		let localKeywords = KeywordHelper.searchKeyword(document)
 		let includedKeywords = KeywordHelper.searchAllIncludedKeyword(included);
 		let libKeywords = KeywordHelper.getKeywordLibrary(included.concat(document));
-		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
+		let allKeywords = localKeywords.concat(SYNTAX, includedKeywords, libKeywords);
 		let suggestionsString = Util.analyzeSentenceLikeliness(fileName, Array.from(new Set(allKeywords)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
