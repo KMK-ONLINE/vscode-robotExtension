@@ -1,6 +1,6 @@
 # robotf-extension README
 
-This is visual studio extension for robot framework. this extension is still in its early stage but fully functioning
+This is visual studio extension for robot framework. this extension is still in its early stage but its fully functional
 
 ## Features
 
