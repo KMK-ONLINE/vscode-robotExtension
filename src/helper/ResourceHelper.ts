@@ -1,13 +1,13 @@
 'use strict';
 
 import vscode = require('vscode');
-import { Util } from './Util';
-import { WorkspaceContext } from './WorkspaceContext';
+import { Util } from '../Util';
+import { WorkspaceContext } from '../WorkspaceContext';
 
-export class ResourceProvider {
+export class ResourceHelper {
 
     public static getResourceByName(resourceName: string, document: vscode.TextDocument): vscode.TextDocument {
-        let files = ResourceProvider.allIncludedResources(document);
+        let files = ResourceHelper.allIncludedResources(document);
         files.push(document);
         for (let i = 0; i < files.length; i++) {
             if (resourceName == Util.extractFileNameWithNoExtension(files[i].fileName)) {
@@ -17,15 +17,21 @@ export class ResourceProvider {
     }
 
     public static allIncludedResources(document: vscode.TextDocument): vscode.TextDocument[] {
-        let included = ResourceProvider.resourceSearcher(document);
-        let indirectInclude: vscode.TextDocument[] = [];
+        let included = ResourceHelper.resourceSearcher(document);
         let temp: vscode.TextDocument[][] = [];
         let length = included.length;
         for (let i = 0; i < length; i++) {
-            temp.push(ResourceProvider.resourceSearcher(included[i]));
+            temp.push(ResourceHelper.resourceSearcher(included[i]));
             if (temp[i] != null) {
                 for (let j = 0; j < temp[i].length; j++) {
+                    let indirectInclude :vscode.TextDocument[];
                     included.push(temp[i][j]);
+                    indirectInclude = ResourceHelper.resourceSearcher(temp[i][j]);
+                    if(indirectInclude != null){
+                        for(let k = 0; k < indirectInclude.length; k++){
+                            included.push(indirectInclude[k]);
+                        }
+                    }
                 }
             }
         }
@@ -39,7 +45,7 @@ export class ResourceProvider {
             let line = document.lineAt(i).text;
             let matches = line.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
             if (matches) {
-                let docs = ResourceProvider.documentSearcher(document, matches[1]);
+                let docs = ResourceHelper.documentSearcher(document, matches[1]);
                 resources.push(docs);
             }
         }
@@ -56,7 +62,7 @@ export class ResourceProvider {
     }
 
     public static documentSearcher(thisDocument: vscode.TextDocument, filePath: string): vscode.TextDocument {
-        return WorkspaceContext.getDocumentByPath(ResourceProvider.pathSearcher(thisDocument, filePath));
+        return WorkspaceContext.getDocumentByPath(ResourceHelper.pathSearcher(thisDocument, filePath));
     }
 
     public static pathSearcher(thisDocument: vscode.TextDocument, filePath: string): string {
@@ -98,14 +104,14 @@ export class ResourceProvider {
     public static resourcesFormatter(thisDocument: vscode.TextDocument, start: string, path: string[]): string[] {
         let resourcesFormat: string[] = [];
         for (let i = 0; i < path.length; i++) {
-            resourcesFormat.push(ResourceProvider.resourceFormatter(thisDocument, start, path[i]));
+            resourcesFormat.push(ResourceHelper.resourceFormatter(thisDocument, start, path[i]));
         }
         return resourcesFormat;
     }
 
     public static autoResourcesFormatter(thisDocument: vscode.TextDocument, path: string[]): string[] {
         let resourcesFormat: string[] = ["Resource"];
-        resourcesFormat = resourcesFormat.concat(ResourceProvider.resourcesFormatter(thisDocument, "Resource                  ", path));
+        resourcesFormat = resourcesFormat.concat(ResourceHelper.resourcesFormatter(thisDocument, "Resource                  ", path));
         return resourcesFormat;
     }
 }

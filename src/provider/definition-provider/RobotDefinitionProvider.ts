@@ -1,10 +1,10 @@
 'use strict';
 
 import vscode = require('vscode');
-import { ResourceProvider } from './ResourceProvider';
-import { KeywordProvider } from './KeywordProvider';
-import { Util } from './Util';
-import { WorkspaceContext } from './WorkspaceContext';
+import { ResourceHelper } from '../../helper/ResourceHelper';
+import { KeywordHelper } from '../../helper/KeywordHelper';
+import { Util } from '../../Util';
+import { WorkspaceContext } from '../../WorkspaceContext';
 
 export class RobotDefinitionProvider implements vscode.DefinitionProvider {
 
@@ -14,7 +14,7 @@ export class RobotDefinitionProvider implements vscode.DefinitionProvider {
     }
 
     private static definitionProvider(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Definition> {
-        let key = KeywordProvider.getKeywordByPosition(document, position);
+        let key = KeywordHelper.getKeywordByPosition(document, position);
         if (key != null) {
             if (key.length == 2) {
                 return RobotDefinitionProvider.includedKeywordDefinition(document, key[0], key[1]);
@@ -29,12 +29,12 @@ export class RobotDefinitionProvider implements vscode.DefinitionProvider {
     private static keywordDefinition(document: vscode.TextDocument, keyword: string): vscode.ProviderResult<vscode.Definition> {
         let result;
         try {
-            let resources = ResourceProvider.allIncludedResources(document);
+            let resources = ResourceHelper.allIncludedResources(document);
             resources.push(document);
             let resource: string;
             let lineNumber: number;
             for (let i = 0; i < resources.length; i++) {
-                lineNumber = KeywordProvider.getKeywordPosition(resources[i], keyword);
+                lineNumber = KeywordHelper.getKeywordPosition(resources[i], keyword);
                 if (lineNumber > 0) {
                     resource = resources[i].fileName;
                     break;
@@ -53,8 +53,8 @@ export class RobotDefinitionProvider implements vscode.DefinitionProvider {
     private static includedKeywordDefinition(document: vscode.TextDocument, file: string, keyword: string): vscode.ProviderResult<vscode.Definition> {
         let result;
         try {
-            let resource = ResourceProvider.getResourceByName(file, document);
-            let lineNumber = KeywordProvider.getKeywordPosition(resource, keyword);
+            let resource = ResourceHelper.getResourceByName(file, document);
+            let lineNumber = KeywordHelper.getKeywordPosition(resource, keyword);
             result = new vscode.Location(vscode.Uri.file(resource.fileName), new vscode.Position(lineNumber, 0));
         }
         catch (e) {

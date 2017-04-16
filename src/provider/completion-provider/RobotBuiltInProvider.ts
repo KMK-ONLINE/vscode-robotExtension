@@ -1,9 +1,9 @@
 'use strict';
 
 import vscode = require('vscode');
-import { Util } from './Util';
+import { Util } from '../../Util';
 
-export class builtInCompletionProvider implements vscode.CompletionItemProvider {
+export class RobotBuiltInProvider implements vscode.CompletionItemProvider {
     private dictionary: string[] = [
         "*** Variable ***\n",
         "*** Settings ***\n",

@@ -1,5 +1,4 @@
 import { resolve } from 'dns';
-import {ResourceProvider} from './ResourceProvider';
 import vscode = require('vscode');
 import { Util } from './Util';
 import fs = require('fs');

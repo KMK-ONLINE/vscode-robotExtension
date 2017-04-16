@@ -1,15 +1,20 @@
 'use strict';
 
 import vscode = require('vscode');
-import { LIB } from './CommonKeywordDictionary';
-import { Util } from './Util';
+import { LIB } from './KeywordDictionary';
+import { Util } from '../Util';
+import { WorkspaceContext } from '../WorkspaceContext';
 
-export class KeywordProvider {
-
+export class KeywordHelper {
+/*
+    public getAllKeywordReferences(document :vscode.TextDocument, keyword : string): vscode.Location[]{
+        
+    }
+*/    
     public static getKeywordLibrary(included: vscode.TextDocument[]): string[] {
         let allLibs: Set<string> = new Set();
         for (let i = 0; i < included.length; i++) {
-            let libs = KeywordProvider.includedLibrarySearcher(included[i]);
+            let libs = KeywordHelper.includedLibrarySearcher(included[i]);
             for (let j = 0; j < libs.length; j++) {
                 allLibs.add(libs[j]);
             }
@@ -82,9 +87,9 @@ export class KeywordProvider {
         let keywords: string[] = [];
         for (let i = 0; i < files.length; i++) {
             keywords.push(Util.extractFileNameWithNoExtension(files[i].fileName));
-            let fileKeywords = KeywordProvider.keywordSearcher(files[i]);
+            let fileKeywords = KeywordHelper.keywordSearcher(files[i]);
             if (fileKeywords.length > 0) {
-                let fileAndKeywords = KeywordProvider.fileAndKeywordsMerger(files[i], fileKeywords);
+                let fileAndKeywords = KeywordHelper.fileAndKeywordsMerger(files[i], fileKeywords);
                 keywords = keywords.concat(fileAndKeywords);
             }
         }

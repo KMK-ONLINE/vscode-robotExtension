@@ -1,10 +1,10 @@
 'use strict';
-import { WorkspaceContext } from './WorkspaceContext';
 
+import { WorkspaceContext } from '../../WorkspaceContext';
 import vscode = require('vscode');
-import { ResourceProvider } from './ResourceProvider';
-import { KeywordProvider } from './KeywordProvider';
-import { Util } from './Util';
+import { ResourceHelper } from '../../helper/ResourceHelper';
+import { KeywordHelper } from '../../helper/KeywordHelper';
+import { Util } from '../../Util';
 
 var SYNTAX = [
 	"Documentation", "Library", "Resouce"
@@ -37,10 +37,10 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 	}
 
 	private keywordMatcher(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
-		let included = ResourceProvider.allIncludedResources(document);
-		let localKeywords = KeywordProvider.keywordSearcher(document)
-		let includedKeywords = KeywordProvider.allIncludedKeywordsSearcher(included);
-		let libKeywords = KeywordProvider.getKeywordLibrary(included.concat(document));
+		let included = ResourceHelper.allIncludedResources(document);
+		let localKeywords = KeywordHelper.keywordSearcher(document)
+		let includedKeywords = KeywordHelper.allIncludedKeywordsSearcher(included);
+		let libKeywords = KeywordHelper.getKeywordLibrary(included.concat(document));
 		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
 		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, Array.from(new Set(allKeywords)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
@@ -48,14 +48,14 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 
 	private resourceCompleter(document: vscode.TextDocument, path: string): vscode.CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
-		let resourceRelativePath = ResourceProvider.resourcesFormatter(document, "", resources);
+		let resourceRelativePath = ResourceHelper.resourcesFormatter(document, "", resources);
 		let suggestionsString = Util.sentenceLikelyAnalyzer(path, Array.from(new Set(resourceRelativePath)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
 
 	private resourceMatcher(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
-		let includesFormat = ResourceProvider.autoResourcesFormatter(document, resources);
+		let includesFormat = ResourceHelper.autoResourcesFormatter(document, resources);
 		let suggestionsString = Util.sentenceLikelyAnalyzer(fileName, Array.from(new Set(includesFormat)));
 		return Util.stringArrayToCompletionItems(suggestionsString);
 	}
