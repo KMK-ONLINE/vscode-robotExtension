@@ -135,7 +135,7 @@ export class KeywordHelper {
                 }
             }
             line = line.substr(index);
-            let match1 = line.match(/^(([-_]*\w+)+)\.((\w+\s?)+)/);
+            let match1 = line.match(/^(([-_]*\w+)+)\.((\w+\s?)*)/);
             let match2 = line.match(/^((\w+\s?)+)(\s{2,})?$/);
             if (match1) {
                 return [match1[1], match1[3].replace(/\s+$/, "")];
@@ -148,6 +148,16 @@ export class KeywordHelper {
             }
         }
     }
+
+    public static getResourceKeywordByFileName(resources: vscode.TextDocument[], fileName: string): string[] {
+		for (let i = 0; i < resources.length; i++) {
+			let resName = Util.extractFileNameWithNoExtension(resources[i].fileName);
+			if (resName == fileName) {
+				return KeywordHelper.searchKeyword(resources[i]);
+			}
+		}
+		return null;
+	}
 
     public static getKeywordDeclarationPosition(file: vscode.TextDocument, keyword: string): vscode.Range {
         for (let i = 0; i < file.lineCount; i++) {
@@ -164,7 +174,6 @@ export class KeywordHelper {
     public static searchAllIncludedKeyword(files: vscode.TextDocument[]): string[] {
         let keywords: string[] = [];
         for (let i = 0; i < files.length; i++) {
-            keywords.push(Util.extractFileNameWithNoExtension(files[i].fileName));
             let fileKeywords = KeywordHelper.searchKeyword(files[i]);
             if (fileKeywords.length > 0) {
                 let fileAndKeywords = KeywordHelper.mergeFileAndKeyword(files[i], fileKeywords);

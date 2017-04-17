@@ -18,3 +18,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [1.2.0]
 ### Added
 - Added rename provider for keyword
+
+## [1.2.6] 4-apr-17
+### Bug Fix
+- Fixed double dollar sign in variable autocomplete
+- Fixed double keyword in keyword autocomplete
+- Fixed resource path in resource autocomplete
+- Fixed builtin keyword that did not appear at suggestion
+### Added
+- Added some new builtin keyword

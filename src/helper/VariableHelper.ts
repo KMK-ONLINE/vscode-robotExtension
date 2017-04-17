@@ -8,8 +8,7 @@ export class VariableHelper {
     public static getVariablesNames(document: vscode.TextDocument, match: string): string[] {
         let included = ResourceHelper.allIncludedResources(document);
         let allVariablesNames = VariableHelper.allAvailableVariables(document, included);
-        let suggestionsString = Util.analyzeSentenceLikeliness(match, Array.from(new Set(allVariablesNames)));
-        return suggestionsString;
+        return Array.from(new Set(allVariablesNames));
     }
 
     public static getVariables(document: vscode.TextDocument, match: string): string[] {
@@ -71,7 +70,7 @@ export class VariableHelper {
     public static formatVariables(varNames: string[]): string[] {
         let varFormat: string[] = [];
         for (let i = 0; i < varNames.length; i++) {
-            varFormat.push("${" + varNames[i] + "}");
+            varFormat.push("{" + varNames[i] + "}");
         }
         return varFormat;
     }

@@ -27,23 +27,11 @@ export class Util {
         return result;
     }
 
-    public static stringArrayToCompletionItems(suggestions: string[]): vscode.CompletionItem[] {
+    public static stringArrayToCompletionItems(suggestions: string[], type: vscode.CompletionItemKind): vscode.CompletionItem[] {
         let items: vscode.CompletionItem[] = [];
         for (let i = 0; i < suggestions.length; i++) {
-            items.push(new vscode.CompletionItem(suggestions[i]));
+            items.push(new vscode.CompletionItem(suggestions[i], type));
         }
         return items;
-    }
-
-    public static analyzeSentenceLikeliness(sentence: string, suggestions: string[]): string[] {
-        let suggestLikely: string[] = [];
-        let search = sentence.toUpperCase();
-        for (let i = 0; i < suggestions.length; i++) {
-            let options = suggestions[i].toUpperCase();
-            if (options.includes(search)) {
-                suggestLikely.push(suggestions[i]);
-            }
-        }
-        return suggestLikely;
     }
 }

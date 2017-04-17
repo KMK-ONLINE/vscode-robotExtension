@@ -101,14 +101,15 @@ export class ResourceHelper {
     }
 
     public static formatResource(thisDocument: vscode.TextDocument, start: string, path: string): string {
-        let filePath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "");
+        let filePath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "").replace(/\\/g,"/");
+        path = path.replace(/\\/g,"/");
         let temp = Util.removeSamePath(filePath, path);
         let format: string;
         while (/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/.test(temp[0])) {
             temp[0] = temp[0].replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/, "");
             temp[1] = "../" + temp[1];
         }
-        return (start + temp[1]).replace(/\\/gi, "/");
+        return (start + temp[1]);
     }
 
     public static formatResources(thisDocument: vscode.TextDocument, start: string, path: string[]): string[] {
@@ -120,7 +121,7 @@ export class ResourceHelper {
     }
 
     public static autoFormatResources(thisDocument: vscode.TextDocument, path: string[]): string[] {
-        let resourcesFormat: string[] = ["Resource"];
+        let resourcesFormat: string[] = [];
         resourcesFormat = resourcesFormat.concat(ResourceHelper.formatResources(thisDocument, "Resource                  ", path));
         return resourcesFormat;
     }

@@ -13,14 +13,10 @@ export class RobotVariableCompletionProvider implements vscode.CompletionItemPro
         let matcher1 = line.text.match(/\$\{(\w*\s*[-_]*)\}/);
         let matcher2 = line.text.match(/(\$\{?(\w*\s*[-_]*))(\s+|$)/);
         if (matcher1) {
-            return Promise.resolve().then(() => {
-                return Util.stringArrayToCompletionItems(VariableHelper.getVariablesNames(document, matcher1[1]));
-            });
+            return Util.stringArrayToCompletionItems(VariableHelper.getVariablesNames(document, matcher1[1]), vscode.CompletionItemKind.Variable);
         }
         else if (matcher2) {
-            return Promise.resolve().then(() => {
-                return Util.stringArrayToCompletionItems(VariableHelper.getVariables(document, matcher2[2]));
-            });
+            return Util.stringArrayToCompletionItems(VariableHelper.getVariables(document, matcher2[2]), vscode.CompletionItemKind.Variable);
         }
     }
 }

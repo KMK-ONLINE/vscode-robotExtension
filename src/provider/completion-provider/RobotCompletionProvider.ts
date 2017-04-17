@@ -24,37 +24,34 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 			if (keyword.length == 1) {
 				return this.matchKeyword(document, keyword[0]);
 			}
-			else {
-				return this.matchKeyword(document, keyword[1]);
-			}
 		}
 		else {
-			return Util.stringArrayToCompletionItems(SYNTAX);
+			return Util.stringArrayToCompletionItems(SYNTAX, vscode.CompletionItemKind.Keyword);
 		}
 	}
 
-	private matchKeyword(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
+	private matchKeyword(document: vscode.TextDocument, match: string): vscode.CompletionItem[] {
 		let included = ResourceHelper.allIncludedResources(document);
 		let localKeywords = KeywordHelper.searchKeyword(document)
 		let includedKeywords = KeywordHelper.searchAllIncludedKeyword(included);
 		let libKeywords = KeywordHelper.getKeywordLibrary(included.concat(document));
-		let allKeywords = localKeywords.concat(SYNTAX, includedKeywords, libKeywords);
-		let suggestionsString = Util.analyzeSentenceLikeliness(fileName, Array.from(new Set(allKeywords)));
-		return Util.stringArrayToCompletionItems(suggestionsString);
+		let allKeywords = Util.stringArrayToCompletionItems(localKeywords.concat(includedKeywords, libKeywords), vscode.CompletionItemKind.Function);
+		let allFileNames = Util.stringArrayToCompletionItems(ResourceHelper.documentsToNames(included), vscode.CompletionItemKind.Class);
+		let all = allKeywords.concat(Util.stringArrayToCompletionItems(SYNTAX, vscode.CompletionItemKind.Keyword), allFileNames);
+		return all;
 	}
 
 	private completeResource(document: vscode.TextDocument, path: string): vscode.CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
 		let resourceRelativePath = ResourceHelper.formatResources(document, "", resources);
-		let suggestionsString = Util.analyzeSentenceLikeliness(path, Array.from(new Set(resourceRelativePath)));
-		return Util.stringArrayToCompletionItems(suggestionsString);
+		return Util.stringArrayToCompletionItems(resourceRelativePath, vscode.CompletionItemKind.File);
 	}
 
 	private matchResource(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
 		let includesFormat = ResourceHelper.autoFormatResources(document, resources);
-		let suggestionsString = Util.analyzeSentenceLikeliness(fileName, Array.from(new Set(includesFormat)));
-		return Util.stringArrayToCompletionItems(suggestionsString);
+		let completionItem = Util.stringArrayToCompletionItems(includesFormat, vscode.CompletionItemKind.File);
+		return [new vscode.CompletionItem("Resource", vscode.CompletionItemKind.Keyword)].concat(completionItem);;
 	}
 
 }

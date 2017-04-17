@@ -1,8 +1,8 @@
 export var SYNTAX: string[] = [
 	"Documentation", "Library", "Resouce", "sizzle=", "css=", "dom=", "return", "id=", "identifier=", "name=", "xpath=",
 	"link=", "partial link=", "jquery=", "tag=", "default=", "text=", "timeout=", "message=", "loglevel=", "persist=",
-	"True", "False", "Test Setup", "Test Teardown", "Call Method", "Catenate", "Comment", "Continue For Loop",
-	"Continue For Loop If", "Convert To Binary", "Convert To Boolean", "Convert To Bytes", "Convert To Hex",
+	"hidden=", "True", "False", "Test Setup", "Test Teardown", "Call Method", "Catenate", "Comment", "Continue For Loop",
+	"Continue For Loop If", "Convert To Binary", "Convert To Boolean", "Convert To Bytes", "Convert To Hex", "ELSE",
 	"Convert To Integer", "Convert To Number", "Convert To Octal", "Convert To String", "Create Dictionary", "Create List",
 	"Evaluate", "Exit For Loop", "Exit For Loop If", "Fail", "Fatal Error", "Get Count", "Get Length",
 	"Get Library Instance", "Get Time", "Get Variable Value", "Get Variables", "Import Library", "Import Resource",
@@ -20,7 +20,7 @@ export var SYNTAX: string[] = [
 	"Should Contain X Times", "Should End With", "Should Match", "Should Match Regexp", "Should Not Be Empty", "Should Not Be Equal",
 	"Should Not Be Equal As Integers", "Should Not Be Equal As Numbers", "Should Not Be Equal As Strings", "Should Not Be True",
 	"Should Not Contain", "Should Not Contain Any", "Should Not End With", "Should Not Match", "Should Not Match Regexp",
-	"Should Not Start With", "Should Start With", "Sleep", "Variable Should Exist", "Variable Should Not Exist", 
+	"Should Not Start With", "Should Start With", "Sleep", "Variable Should Exist", "Variable Should Not Exist",
 	"Wait Until Keyword Succeeds"
 ];
 
@@ -29,10 +29,10 @@ export var LIB =
 		{
 			name: "Dialogs",
 			key: [
-				"Execute Manual Step", 
-				"Get Selection From User", 
-				"Get Value From User", 
-				"Pause Execution" 
+				"Execute Manual Step",
+				"Get Selection From User",
+				"Get Value From User",
+				"Pause Execution"
 			]
 		},
 		{
