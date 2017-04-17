@@ -73,7 +73,7 @@ export class KeywordHelper {
                         else {
                             let key = keys[1];
                             if (key == keyword) {
-                                locations.push(new vscode.Location(refference[i].uri, new vscode.Range(new vscode.Position(j, found), new vscode.Position(j, found + keyLength - 1))));
+                                locations.push(new vscode.Location(refference[i].uri, new vscode.Range(new vscode.Position(j, found), new vscode.Position(j, found + keyLength))));
                             }
                         }
                     }
