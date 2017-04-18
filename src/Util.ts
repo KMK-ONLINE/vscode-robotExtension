@@ -29,9 +29,19 @@ export class Util {
 
     public static stringArrayToCompletionItems(suggestions: string[], type: vscode.CompletionItemKind): vscode.CompletionItem[] {
         let items: vscode.CompletionItem[] = [];
+        suggestions = Array.from(new Set(suggestions));
         for (let i = 0; i < suggestions.length; i++) {
             items.push(new vscode.CompletionItem(suggestions[i], type));
         }
         return items;
+    }
+
+    public static subArrayOfString(list:string[], start:number){
+        let result:string[] = [];
+        for(let i = 0; i < list.length; i++){
+            let str = list[i].substr(start);
+            result.push(str);
+        }
+        return result;
     }
 }
