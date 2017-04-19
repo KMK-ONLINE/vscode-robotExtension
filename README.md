@@ -1,6 +1,7 @@
 # robotf-extension README
 
-This is visual studio extension for robot framework. this extension is still in its early stage but its fully functional
+This is Visual Studio Code extension for robot framework. this extension is still in its early stage but its fully functional.
+This Extension was created for internal use for Test Engineer at KMK-Labs, but published into Visual Studio Code Extension Marketplace for everyone to use. please email me at nayanda.haberty@kmklabs.com if you found a bug or need new features, I'll try my best to deliver it.
 
 ## Features
 
@@ -62,7 +63,7 @@ Performance issues when handle more than 350++ files in workspace
 
 ## For Contributors
 
-You can added new library with its keywords at src/commonKeywordDictionary.ts with format:
+You can added new suggestion library with its keywords at src/commonKeywordDictionary.ts with format:
 ``` typescript
 export var LIB =
 	[
