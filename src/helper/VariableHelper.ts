@@ -1,22 +1,19 @@
 'use strict';
 
-import vscode = require('vscode');
-import { ResourceHelper } from './ResourceHelper';
-import { Util } from '../Util';
-import {WorkspaceContext} from '../WorkspaceContext';
+import { Location, TextDocument, Range, Position, TextLine, Uri } from 'vscode';
+import { allIncludedResources } from './ResourceHelper';
+import { WorkspaceContext } from '../WorkspaceContext';
 
-export class VariableHelper {
-
-    public static getVariableDefinition(location:vscode.Location):string{
+    export function getVariableDefinition(location: Location): string {
         let doc = WorkspaceContext.getDocumentByUri(location.uri)
         let line = doc.lineAt(location.range.start).text;
         let match = line.match(/^\$\{(([-_.]*\w+\s*)+)\}\s{2,}((\S+\s?)+)\s*$/);
-        if(match){
+        if (match) {
             return match[2];
         }
     }
 
-    public static getVariableByPosition(document: vscode.TextDocument, position: vscode.Position): string {
+    export function getVariableByPosition(document: TextDocument, position: Position): string {
         let line = document.lineAt(position).text;
         let index = position.character;
         let match: boolean = false;
@@ -38,8 +35,8 @@ export class VariableHelper {
         return null;
     }
 
-    public static searchGlobalVarOrigin(document: vscode.TextDocument, varName: string): vscode.Location {
-        let included = ResourceHelper.allIncludedResources(document);
+    export function searchGlobalVarOrigin(document: TextDocument, varName: string): Location {
+        let included = allIncludedResources(document);
         let all = [document].concat(included);
         let isInVarRange = false;
         for (let i = 0; i < all.length; i++) {
@@ -59,8 +56,8 @@ export class VariableHelper {
                     if (match) {
                         if (match[1] == varName) {
                             let found = line.indexOf(match[1]);
-                            let range = new vscode.Range(new vscode.Position(j, found), new vscode.Position(j, varName.length + found));
-                            return new vscode.Location(doc.uri, range);
+                            let range = new Range(new Position(j, found), new Position(j, varName.length + found));
+                            return new Location(doc.uri, range);
                         }
                     }
                     else {
@@ -76,8 +73,8 @@ export class VariableHelper {
                         if (match) {
                             if (match[1] == varName) {
                                 let found = line.indexOf(match[1]);
-                                let range = new vscode.Range(new vscode.Position(j, found), new vscode.Position(j, varName.length + found));
-                                return new vscode.Location(doc.uri, range);
+                                let range = new Range(new Position(j, found), new Position(j, varName.length + found));
+                                return new Location(doc.uri, range);
                             }
                         }
                     }
@@ -86,27 +83,27 @@ export class VariableHelper {
         }
     }
 
-    public static getVariablesNames(document: vscode.TextDocument, match: string): string[] {
-        let included = ResourceHelper.allIncludedResources(document);
-        let allVariablesNames = VariableHelper.allAvailableVariables(document, included);
+    export function getVariablesNames(document: TextDocument, match: string): string[] {
+        let included = allIncludedResources(document);
+        let allVariablesNames = allAvailableVariables(document, included);
         return Array.from(new Set(allVariablesNames));
     }
 
-    public static getVariables(document: vscode.TextDocument, match: string): string[] {
-        let allVariablesNames = VariableHelper.getVariablesNames(document, match);
-        let allVariables = VariableHelper.formatVariables(Array.from(new Set(allVariablesNames)));
+    export function getVariables(document: TextDocument, match: string): string[] {
+        let allVariablesNames = getVariablesNames(document, match);
+        let allVariables = formatVariables(Array.from(new Set(allVariablesNames)));
         return allVariables;
     }
 
-    public static allAvailableVariables(document: vscode.TextDocument, included: vscode.TextDocument[]): string[] {
-        let allVar = VariableHelper.searchAllVariables(document);
+    export function allAvailableVariables(document: TextDocument, included: TextDocument[]): string[] {
+        let allVar = searchAllVariables(document);
         for (let i = 0; i < included.length; i++) {
-            allVar = allVar.concat(VariableHelper.searchAllGlobalVariables(included[i]));
+            allVar = allVar.concat(searchAllGlobalVariables(included[i]));
         }
         return allVar;
     }
 
-    public static searchAllGlobalVariables(file: vscode.TextDocument): string[] {
+    export function searchAllGlobalVariables(file: TextDocument): string[] {
         let variables: Set<string> = new Set();
         let isInVarRange = false;
         for (let i = 0; i < file.lineCount; i++) {
@@ -143,7 +140,7 @@ export class VariableHelper {
         return Array.from(variables);
     }
 
-    public static searchAllVariables(file: vscode.TextDocument): string[] {
+    export function searchAllVariables(file: TextDocument): string[] {
         let variables: Set<string> = new Set();
         for (let i = 0; i < file.lineCount; i++) {
             let line = file.lineAt(i).text;
@@ -155,11 +152,10 @@ export class VariableHelper {
         return Array.from(variables);
     }
 
-    public static formatVariables(varNames: string[]): string[] {
+    export function formatVariables(varNames: string[]): string[] {
         let varFormat: string[] = [];
         for (let i = 0; i < varNames.length; i++) {
             varFormat.push("{" + varNames[i] + "}");
         }
         return varFormat;
     }
-}

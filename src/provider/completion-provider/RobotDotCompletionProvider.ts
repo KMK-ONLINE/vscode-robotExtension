@@ -1,16 +1,16 @@
 'use strict';
 
 import { WorkspaceContext } from '../../WorkspaceContext';
-import vscode = require('vscode');
-import { ResourceHelper } from '../../helper/ResourceHelper';
-import { KeywordHelper } from '../../helper/KeywordHelper';
-import { Util } from '../../Util';
+import { TextDocument, Position, TextLine, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
+import { allIncludedResources } from '../../helper/ResourceHelper';
+import { getKeywordByPosition, getResourceKeywordByFileName } from '../../helper/KeywordHelper';
+import { stringArrayToCompletionItems } from '../../Util';
 
-export class RobotDotCompletionProvider implements vscode.CompletionItemProvider {
+export class RobotDotCompletionProvider implements CompletionItemProvider {
 
-	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[] {
+	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Thenable<CompletionItem[]> | CompletionItem[] {
 		let line = document.lineAt(position);
-		let keyword = KeywordHelper.getKeywordByPosition(document, position);
+		let keyword = getKeywordByPosition(document, position);
 		if (keyword != null) {
 			if (keyword.length == 2) {
 				let sub = keyword[1].length - 1;
@@ -19,14 +19,14 @@ export class RobotDotCompletionProvider implements vscode.CompletionItemProvider
 		}
 		else{
 			let sub = position.character - line.firstNonWhitespaceCharacterIndex;
-			return [new vscode.CompletionItem("...		".substr(sub), vscode.CompletionItemKind.Snippet)]
+			return [new CompletionItem("...		".substr(sub), CompletionItemKind.Snippet)]
 		}
 	}
 
-	private matchJustKeyword(document: vscode.TextDocument, fileName: string): vscode.CompletionItem[] {
-		let included = ResourceHelper.allIncludedResources(document);
-		let keywords = KeywordHelper.getResourceKeywordByFileName(included, fileName);
-		let completionItem = Util.stringArrayToCompletionItems(keywords, vscode.CompletionItemKind.Function);
+	private matchJustKeyword(document: TextDocument, fileName: string): CompletionItem[] {
+		let included = allIncludedResources(document);
+		let keywords = getResourceKeywordByFileName(included, fileName);
+		let completionItem = stringArrayToCompletionItems(keywords, CompletionItemKind.Function);
 		return completionItem;
 	}
 }

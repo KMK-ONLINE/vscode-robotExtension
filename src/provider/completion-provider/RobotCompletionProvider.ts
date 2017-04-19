@@ -1,17 +1,17 @@
 'use strict';
 
 import { WorkspaceContext } from '../../WorkspaceContext';
-import vscode = require('vscode');
-import { ResourceHelper } from '../../helper/ResourceHelper';
-import { KeywordHelper } from '../../helper/KeywordHelper';
-import { Util } from '../../Util';
+import { TextDocument, Position, TextLine, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
+import { allIncludedResources, formatResources, autoFormatResources, documentsToNames } from '../../helper/ResourceHelper';
+import { getKeywordByPosition, searchKeyword, searchAllIncludedKeyword, getKeywordLibrary } from '../../helper/KeywordHelper';
+import { stringArrayToCompletionItems  } from '../../Util';
 import { SYNTAX } from '../../helper/KeywordDictionary';
 
-export class RobotCompletionProvider implements vscode.CompletionItemProvider {
+export class RobotCompletionProvider implements CompletionItemProvider {
 
-	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[] {
+	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Thenable<CompletionItem[]> | CompletionItem[] {
 		let line = document.lineAt(position);
-		let keyword = KeywordHelper.getKeywordByPosition(document, position);
+		let keyword = getKeywordByPosition(document, position);
 		let resourceMatcher1 = line.text.match(/^([rR][eE]?[sS]?[oO]?[uU]?[rR]?[cC]?[eE]?)$/);
 		let resourceMatcher2 = line.text.match(/^Resource\s{2,}(([-_]+|\w+)+)\s*$/);
 		if (resourceMatcher1) {
@@ -29,40 +29,40 @@ export class RobotCompletionProvider implements vscode.CompletionItemProvider {
 			}
 		}
 		else {
-			return Util.stringArrayToCompletionItems(SYNTAX, vscode.CompletionItemKind.Keyword);
+			return stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
 		}
 	}
 
-	private matchJustKeyword(document: vscode.TextDocument): vscode.CompletionItem[] {
-		let included = ResourceHelper.allIncludedResources(document);
-		let localKeywords = KeywordHelper.searchKeyword(document)
-		let includedKeywords = KeywordHelper.searchAllIncludedKeyword(included);
-		let libKeywords = KeywordHelper.getKeywordLibrary(included.concat(document));
+	private matchJustKeyword(document: TextDocument): CompletionItem[] {
+		let included = allIncludedResources(document);
+		let localKeywords = searchKeyword(document)
+		let includedKeywords = searchAllIncludedKeyword(included);
+		let libKeywords = getKeywordLibrary(included.concat(document));
 		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
-		let keys = Util.stringArrayToCompletionItems(allKeywords, vscode.CompletionItemKind.Function);
-		let all = keys.concat(Util.stringArrayToCompletionItems(SYNTAX, vscode.CompletionItemKind.Keyword));
+		let keys = stringArrayToCompletionItems(allKeywords, CompletionItemKind.Function);
+		let all = keys.concat(stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword));
 		return Array.from(new Set(all));
 	}
 
-	private matchKeyword(document: vscode.TextDocument): vscode.CompletionItem[] {
-		let included = ResourceHelper.allIncludedResources(document);
-		let allFileNames = ResourceHelper.documentsToNames(included);
-		let files = Util.stringArrayToCompletionItems(allFileNames, vscode.CompletionItemKind.Class);
+	private matchKeyword(document: TextDocument): CompletionItem[] {
+		let included = allIncludedResources(document);
+		let allFileNames = documentsToNames(included);
+		let files = stringArrayToCompletionItems(allFileNames, CompletionItemKind.Class);
 		let all = files.concat(this.matchJustKeyword(document));
 		return Array.from(new Set(all));
 	}
 
-	private completeResource(document: vscode.TextDocument): vscode.CompletionItem[] {
+	private completeResource(document: TextDocument): CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
-		let resourceRelativePath = ResourceHelper.formatResources(document, "", resources);
-		return Util.stringArrayToCompletionItems(resourceRelativePath, vscode.CompletionItemKind.File);
+		let resourceRelativePath = formatResources(document, "", resources);
+		return stringArrayToCompletionItems(resourceRelativePath, CompletionItemKind.File);
 	}
 
-	private matchResource(document: vscode.TextDocument): vscode.CompletionItem[] {
+	private matchResource(document: TextDocument): CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
-		let includesFormat = ResourceHelper.autoFormatResources(document, resources);
-		let completionItem = Util.stringArrayToCompletionItems(includesFormat, vscode.CompletionItemKind.File);
-		return [new vscode.CompletionItem("Resource", vscode.CompletionItemKind.Keyword)].concat(completionItem);;
+		let includesFormat = autoFormatResources(document, resources);
+		let completionItem = stringArrayToCompletionItems(includesFormat, CompletionItemKind.File);
+		return [new CompletionItem("Resource", CompletionItemKind.Keyword)].concat(completionItem);;
 	}
 
 }

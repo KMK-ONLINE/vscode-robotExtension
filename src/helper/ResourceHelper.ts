@@ -1,128 +1,125 @@
 'use strict';
 
-import vscode = require('vscode');
-import { Util } from '../Util';
+import { Location, TextDocument, Range, Position, TextLine, Uri } from 'vscode';
+import { extractFileNameWithNoExtension, removeSamePath } from '../Util';
 import { WorkspaceContext } from '../WorkspaceContext';
 
-export class ResourceHelper {
+export function getAllResourceRefferences(resource: TextDocument): TextDocument[] {
+    let reff: TextDocument[] = [resource];
+    let allDocs = WorkspaceContext.getAllDocuments();
+    for (let i = 0; i < allDocs.length; i++) {
+        if (allDocs[i] != resource) {
+            let included = allIncludedResources(allDocs[i]);
+            for (let j = 0; j < included.length; j++) {
+                if (included[j] == resource) {
+                    reff.push(allDocs[i]);
+                    break;
+                }
+            }
+        }
+    }
+    return reff;
+}
 
-    public static getAllResourceRefferences(resource: vscode.TextDocument): vscode.TextDocument[] {
-        let reff: vscode.TextDocument[] = [resource];
-        let allDocs = WorkspaceContext.getAllDocuments();
-        for (let i = 0; i < allDocs.length; i++) {
-            if (allDocs[i] != resource) {
-                let included = ResourceHelper.allIncludedResources(allDocs[i]);
-                for (let j = 0; j < included.length; j++) {
-                    if (included[j] == resource) {
-                        reff.push(allDocs[i]);
-                        break;
+export function getResourceByName(resourceName: string, document: TextDocument): TextDocument {
+    let files = allIncludedResources(document);
+    files.push(document);
+    for (let i = 0; i < files.length; i++) {
+        if (resourceName == extractFileNameWithNoExtension(files[i].fileName)) {
+            return files[i];
+        }
+    }
+}
+
+export function allIncludedResources(document: TextDocument): TextDocument[] {
+    let included = searchResource(document);
+    let length = included.length;
+    for (let i = 0; i < length; i++) {
+        let temp = searchResource(included[i])
+        if (temp != null) {
+            for (let j = 0; j < temp.length; j++) {
+                let indirectInclude: TextDocument[];
+                included.push(temp[j]);
+                indirectInclude = searchResource(temp[j]);
+                if (indirectInclude != null) {
+                    for (let k = 0; k < indirectInclude.length; k++) {
+                        included.push(indirectInclude[k]);
                     }
                 }
             }
         }
-        return reff;
     }
+    return included;
+}
 
-    public static getResourceByName(resourceName: string, document: vscode.TextDocument): vscode.TextDocument {
-        let files = ResourceHelper.allIncludedResources(document);
-        files.push(document);
-        for (let i = 0; i < files.length; i++) {
-            if (resourceName == Util.extractFileNameWithNoExtension(files[i].fileName)) {
-                return files[i];
+export function searchResource(document: TextDocument): TextDocument[] {
+    let fileLength = document.lineCount;
+    let resources: TextDocument[] = [];
+    for (let i = 0; i < fileLength; i++) {
+        let line = document.lineAt(i).text;
+        let matches = line.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
+        if (matches) {
+            let docs = searchDocumentOrigin(document, matches[1]);
+            if (docs != null) {
+                resources.push(docs);
             }
         }
     }
+    return resources;
+}
 
-    public static allIncludedResources(document: vscode.TextDocument): vscode.TextDocument[] {
-        let included = ResourceHelper.searchResource(document);
-        let length = included.length;
-        for (let i = 0; i < length; i++) {
-            let temp = ResourceHelper.searchResource(included[i])
-            if (temp != null) {
-                for (let j = 0; j < temp.length; j++) {
-                    let indirectInclude: vscode.TextDocument[];
-                    included.push(temp[j]);
-                    indirectInclude = ResourceHelper.searchResource(temp[j]);
-                    if (indirectInclude != null) {
-                        for (let k = 0; k < indirectInclude.length; k++) {
-                            included.push(indirectInclude[k]);
-                        }
-                    }
-                }
-            }
+export function searchFileByName(files: TextDocument[], fileName: string): TextDocument {
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].fileName == fileName) {
+            return files[i];
         }
-        return included;
     }
+    return null;
+}
 
-    public static searchResource(document: vscode.TextDocument): vscode.TextDocument[] {
-        let fileLength = document.lineCount;
-        let resources: vscode.TextDocument[] = [];
-        for (let i = 0; i < fileLength; i++) {
-            let line = document.lineAt(i).text;
-            let matches = line.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
-            if (matches) {
-                let docs = ResourceHelper.searchDocumentOrigin(document, matches[1]);
-                if (docs != null) {
-                    resources.push(docs);
-                }
-            }
-        }
-        return resources;
-    }
+export function searchDocumentOrigin(thisDocument: TextDocument, filePath: string): TextDocument {
+    return WorkspaceContext.getDocumentByPath(searchPathOrigin(thisDocument, filePath));
+}
 
-    public static searchFileByName(files: vscode.TextDocument[], fileName: string): vscode.TextDocument {
-        for (let i = 0; i < files.length; i++) {
-            if (files[i].fileName == fileName) {
-                return files[i];
-            }
-        }
-        return null;
+export function searchPathOrigin(thisDocument: TextDocument, filePath: string): string {
+    let thisFolderPath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "");
+    while (/^\.\.\.?\//.test(filePath)) {
+        filePath = filePath.replace(/^\.\.\.?\//, "");
+        thisFolderPath = thisFolderPath.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+(\/|\\)$/, "");
     }
+    return thisFolderPath + filePath;
+}
 
-    public static searchDocumentOrigin(thisDocument: vscode.TextDocument, filePath: string): vscode.TextDocument {
-        return WorkspaceContext.getDocumentByPath(ResourceHelper.searchPathOrigin(thisDocument, filePath));
+export function documentsToNames(documents: TextDocument[]): string[] {
+    let converted: string[] = [];
+    for (let i = 0; i < documents.length; i++) {
+        converted[i] = extractFileNameWithNoExtension(documents[i].fileName);
     }
+    return converted;
+}
 
-    public static searchPathOrigin(thisDocument: vscode.TextDocument, filePath: string): string {
-        let thisFolderPath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "");
-        while (/^\.\.\.?\//.test(filePath)) {
-            filePath = filePath.replace(/^\.\.\.?\//, "");
-            thisFolderPath = thisFolderPath.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+(\/|\\)$/, "");
-        }
-        return thisFolderPath + filePath;
+export function formatResource(thisDocument: TextDocument, start: string, path: string): string {
+    let filePath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "").replace(/\\/g, "/");
+    path = path.replace(/\\/g, "/");
+    let temp = removeSamePath(filePath, path);
+    let format: string;
+    while (/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/.test(temp[0])) {
+        temp[0] = temp[0].replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/, "");
+        temp[1] = "../" + temp[1];
     }
+    return (start + temp[1]);
+}
 
-    public static documentsToNames(documents: vscode.TextDocument[]): string[] {
-        let converted: string[] = [];
-        for (let i = 0; i < documents.length; i++) {
-            converted[i] = Util.extractFileNameWithNoExtension(documents[i].fileName);
-        }
-        return converted;
+export function formatResources(thisDocument: TextDocument, start: string, path: string[]): string[] {
+    let resourcesFormat: string[] = [];
+    for (let i = 0; i < path.length; i++) {
+        resourcesFormat.push(formatResource(thisDocument, start, path[i]));
     }
+    return resourcesFormat;
+}
 
-    public static formatResource(thisDocument: vscode.TextDocument, start: string, path: string): string {
-        let filePath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "").replace(/\\/g,"/");
-        path = path.replace(/\\/g,"/");
-        let temp = Util.removeSamePath(filePath, path);
-        let format: string;
-        while (/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/.test(temp[0])) {
-            temp[0] = temp[0].replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/, "");
-            temp[1] = "../" + temp[1];
-        }
-        return (start + temp[1]);
-    }
-
-    public static formatResources(thisDocument: vscode.TextDocument, start: string, path: string[]): string[] {
-        let resourcesFormat: string[] = [];
-        for (let i = 0; i < path.length; i++) {
-            resourcesFormat.push(ResourceHelper.formatResource(thisDocument, start, path[i]));
-        }
-        return resourcesFormat;
-    }
-
-    public static autoFormatResources(thisDocument: vscode.TextDocument, path: string[]): string[] {
-        let resourcesFormat: string[] = [];
-        resourcesFormat = resourcesFormat.concat(ResourceHelper.formatResources(thisDocument, "Resource                  ", path));
-        return resourcesFormat;
-    }
+export function autoFormatResources(thisDocument: TextDocument, path: string[]): string[] {
+    let resourcesFormat: string[] = [];
+    resourcesFormat = resourcesFormat.concat(formatResources(thisDocument, "Resource                  ", path));
+    return resourcesFormat;
 }

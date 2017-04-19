@@ -1,22 +1,21 @@
 'use strict';
 
-import vscode = require('vscode');
-import { ResourceHelper } from '../../helper/ResourceHelper';
-import { Util } from '../../Util';
+import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
+import { stringArrayToCompletionItems } from '../../Util';
 import { WorkspaceContext } from '../../WorkspaceContext';
-import { VariableHelper } from '../../helper/VariableHelper';
+import { getVariablesNames, getVariables } from '../../helper/VariableHelper';
 
-export class RobotVariableCompletionProvider implements vscode.CompletionItemProvider {
+export class RobotVariableCompletionProvider implements CompletionItemProvider {
 
-    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[] {
+    public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Thenable<CompletionItem[]> | CompletionItem[] {
         let line = document.lineAt(position);
         let matcher1 = line.text.match(/\$\{(\w*\s*[-_]*)\}/);
         let matcher2 = line.text.match(/(\$\{?(\w*\s*[-_]*))(\s+|$)/);
         if (matcher1) {
-            return Util.stringArrayToCompletionItems(VariableHelper.getVariablesNames(document, matcher1[1]), vscode.CompletionItemKind.Variable);
+            return stringArrayToCompletionItems(getVariablesNames(document, matcher1[1]), CompletionItemKind.Variable);
         }
         else if (matcher2) {
-            return Util.stringArrayToCompletionItems(VariableHelper.getVariables(document, matcher2[2]), vscode.CompletionItemKind.Variable);
+            return stringArrayToCompletionItems(getVariables(document, matcher2[2]), CompletionItemKind.Variable);
         }
     }
 }

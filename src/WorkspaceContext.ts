@@ -1,16 +1,15 @@
 import { resolve } from 'dns';
-import vscode = require('vscode');
-import { Util } from './Util';
+import { workspace, Location, TextDocument, Range, Position, TextLine, Uri } from 'vscode';
 import fs = require('fs');
 
 export class WorkspaceContext {
 
-    private static allDoc: vscode.TextDocument[] = [];
+    private static allDoc: TextDocument[] = [];
     private static allPath: string[] = [];
     private static asyncReadingCounter: number = 0;
-    private static temp: vscode.TextDocument[];
+    private static temp: TextDocument[];
 
-    public static getAllDocuments(): vscode.TextDocument[] {
+    public static getAllDocuments(): TextDocument[] {
         return WorkspaceContext.allDoc;
     }
 
@@ -18,7 +17,7 @@ export class WorkspaceContext {
         return WorkspaceContext.allPath;
     }
 
-    public static getDocumentByPath(path: string): vscode.TextDocument {
+    public static getDocumentByPath(path: string): TextDocument {
         path = path.replace(/(\\|\/)/g, "/");
         for (let i = 0; i < WorkspaceContext.allDoc.length; i++) {
             let docPath = WorkspaceContext.allDoc[i].fileName.replace(/(\\|\/)/g, "/");
@@ -29,7 +28,7 @@ export class WorkspaceContext {
         return null;
     }
 
-    public static getDocumentByUri(uri: vscode.Uri): vscode.TextDocument {
+    public static getDocumentByUri(uri: Uri): TextDocument {
         for (let i = 0; i < WorkspaceContext.allDoc.length; i++) {
             let docPath = WorkspaceContext.allDoc[i].uri.fsPath;
             if (docPath == uri.fsPath) {
@@ -43,11 +42,11 @@ export class WorkspaceContext {
         if (WorkspaceContext.asyncReadingCounter == 0) {
             WorkspaceContext.asyncReadingCounter = 1;
             console.log("scanning all .robot and .txt path");
-            WorkspaceContext.allPath = WorkspaceContext.getAllDirAndDocPath([vscode.workspace.rootPath]);
+            WorkspaceContext.allPath = WorkspaceContext.getAllDirAndDocPath([workspace.rootPath]);
             WorkspaceContext.temp = [];
             WorkspaceContext.asyncReadingCounter += WorkspaceContext.allPath.length;
             for (let i = 0; i < WorkspaceContext.allPath.length; i++) {
-                let opener = vscode.workspace.openTextDocument(vscode.Uri.file(WorkspaceContext.allPath[i]));
+                let opener = workspace.openTextDocument(Uri.file(WorkspaceContext.allPath[i]));
                 opener.then((document) => {
                     WorkspaceContext.temp.push(document);
                     WorkspaceContext.asyncReadingCounter--;
