@@ -3,7 +3,7 @@
 import { WorkspaceContext } from '../../WorkspaceContext';
 import { TextDocument, Position, TextLine, HoverProvider, WorkspaceEdit, ProviderResult, CancellationToken, Location, Hover, Range } from 'vscode';
 import { getKeywordByPosition, getKeywordOrigin, getKeywordDefinition } from '../../helper/KeywordHelper';
-import { getVariableByPosition, getVariableDefinition, searchGlobalVarOrigin } from '../../helper/VariableHelper'
+import { getVariableByPosition, getVariableDefinition, getVariableOrigin } from '../../helper/VariableHelper'
 
 export class RobotHoverProvider implements HoverProvider {
     public provideHover(document: TextDocument, position: Position, token: CancellationToken)
@@ -27,7 +27,7 @@ export class RobotHoverProvider implements HoverProvider {
             }
         }
         else if (variable) {
-            let varOriginLoc = searchGlobalVarOrigin(document, variable);
+            let varOriginLoc = getVariableOrigin(document, variable);
             if (varOriginLoc != null) {
                 let definition = getVariableDefinition(varOriginLoc);
                 return RobotHoverProvider.createHover(

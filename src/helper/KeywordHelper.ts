@@ -17,7 +17,7 @@ export function getKeywordDefinition(location: Location): string {
         for (let i = pos + 1; i < doc.lineCount; i++) {
             let line = doc.lineAt(i).text;
             let isInKeyword = !(/^((([-_]*\w+\s?)+)|\*+)/.test(line));
-            if (isInKeyword) {
+            if (isInKeyword && i < doc.lineCount - 1) {
                 if (!args && /^\s+\[Arguments\]/.test(line)) {
                     args = line.replace(/(^\s+|\s+$)/g, "").replace("[Arguments]", "ARGS:")
                         .replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
@@ -31,8 +31,8 @@ export function getKeywordDefinition(location: Location): string {
             }
             else {
                 if (args || ret) {
-                    if (!args) args = "";
-                    if (!ret) ret = "";
+                    if (!args) args = "ARGS: -";
+                    if (!ret) ret = "RET: -";
                     return "[ " + args + " ], [ " + ret + " ]";
                 }
                 else {

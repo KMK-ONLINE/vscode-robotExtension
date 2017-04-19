@@ -5,20 +5,20 @@ import { extractFileNameWithNoExtension, removeSamePath } from '../Util';
 import { WorkspaceContext } from '../WorkspaceContext';
 
 export function getAllResourceRefferences(resource: TextDocument): TextDocument[] {
-    let reff: TextDocument[] = [resource];
+    let reff: Set<TextDocument> = new Set([resource]);
     let allDocs = WorkspaceContext.getAllDocuments();
     for (let i = 0; i < allDocs.length; i++) {
         if (allDocs[i] != resource) {
             let included = allIncludedResources(allDocs[i]);
             for (let j = 0; j < included.length; j++) {
                 if (included[j] == resource) {
-                    reff.push(allDocs[i]);
+                    reff.add(allDocs[i]);
                     break;
                 }
             }
         }
     }
-    return reff;
+    return Array.from(reff);
 }
 
 export function getResourceByName(resourceName: string, document: TextDocument): TextDocument {
@@ -29,8 +29,7 @@ export function getResourceByName(resourceName: string, document: TextDocument):
             resourceName == extractFileNameWithNoExtension(
                 files[i].fileName
             )
-        ) 
-        {
+        ) {
             return files[i];
         }
     }

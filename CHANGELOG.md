@@ -38,3 +38,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Added
 - Added hover provider for global variable
 - Added hover provider for keyword
+
+## [1.3.2] 19-apr-17
+### Added
+- Added rename provider for variable
+### Bug Fix
+- Various Bug Fix

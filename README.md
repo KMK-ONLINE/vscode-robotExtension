@@ -43,6 +43,11 @@ This Extension was created for internal use for Test Engineer at KMK-Labs, but p
 
 ![Keyword Rename](keyword-rename.png)
 
+* Variable Rename
+    * can rename variable and all its refference
+
+![Variable Rename](variable-rename.png)
+
 * Variable Hover
     * Hovering your mouse on global variable will give you the information about its initialization value
 

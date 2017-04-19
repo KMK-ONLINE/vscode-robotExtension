@@ -1,6 +1,6 @@
 'use strict';
 
-import { searchGlobalVarOrigin, getVariableByPosition } from '../../helper/VariableHelper';
+import { getVariableOrigin, getVariableByPosition } from '../../helper/VariableHelper';
 import { TextDocument, Position, TextLine, Definition, DefinitionProvider, ProviderResult, CancellationToken } from 'vscode';
 import { getKeywordByPosition, getIncludedKeywordOrigin, getKeywordOrigin } from '../../helper/KeywordHelper';
 import { WorkspaceContext } from '../../WorkspaceContext';
@@ -25,7 +25,7 @@ export class RobotDefinitionProvider implements DefinitionProvider {
                 }
             }
             else if (variable != null && variable != "") {
-                return searchGlobalVarOrigin(document, variable);
+                return getVariableOrigin(document, variable);
             }
             return null;
         });
