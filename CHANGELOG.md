@@ -19,7 +19,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Added
 - Added rename provider for keyword
 
-## [1.2.6] 4-apr-17
+## [1.2.6] 17-apr-17
 ### Bug Fix
 - Fixed double dollar sign in variable autocomplete
 - Fixed double keyword in keyword autocomplete
@@ -27,3 +27,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Fixed builtin keyword that did not appear at suggestion
 ### Added
 - Added some new builtin keyword
+
+## [1.2.6] 19-apr-17
+### Bug Fix
+- Fixed duplicated autocomplete
+### Added
+- Added Global and Suite Variable definition

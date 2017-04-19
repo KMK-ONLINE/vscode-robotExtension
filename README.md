@@ -31,6 +31,12 @@ This is visual studio extension for robot framework. this extension is still in 
 
 ![Keyword Definition](keyword-definition.png)
 
+* Variable Definition
+    * Show the original global and suite variable location
+    * ctrl + click to the variable will bring you to the original variable location
+
+![Variable Definition](variable-definition.png)
+
 * Keyword Rename
     * can rename keyword and all its refference
 
