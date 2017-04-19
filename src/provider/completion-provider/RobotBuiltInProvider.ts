@@ -24,7 +24,7 @@ export class RobotBuiltInProvider implements vscode.CompletionItemProvider {
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> | vscode.CompletionItem[] {
         let char = document.lineAt(position).text.charAt(position.character-1);
         if (char == "*") {
-            let sub = position.character - document.lineAt(position).firstNonWhitespaceCharacterIndex - 1;
+            let sub = position.character - document.lineAt(position).firstNonWhitespaceCharacterIndex;
             let res = Util.subArrayOfString(this.dictionary, sub);
             return Util.stringArrayToCompletionItems(res, vscode.CompletionItemKind.Field);
         }

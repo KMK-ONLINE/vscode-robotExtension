@@ -8,6 +8,42 @@ import { ResourceHelper } from './ResourceHelper';
 
 export class KeywordHelper {
 
+    public static getKeywordDefinition(location: vscode.Location): string {
+        let doc = WorkspaceContext.getDocumentByUri(location.uri);
+        let pos = location.range.start.character;
+        let line = doc.lineAt(pos).text;
+        if (/^([-_]*\w+\s?)+\s*$/.test(line)) {
+            let args: string;
+            let ret: string;
+            let result: string = "";
+            for (let i = pos + 1; i < doc.lineCount; i++) {
+                let line = doc.lineAt(i).text;
+                let isInKeyword = !(/^((([-_]*\w+\s?)+)|\*+)/.test(line));
+                if (isInKeyword) {
+                    if (!args && /^\s+\[Arguments\]/.test(line)) {
+                        args = line.replace(/(^\s+|\s+$)/g, "").replace("[Arguments]", "[ARGS]:").replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
+                        args = args.replace(/\s/g, ", ").replace("]:,", "]:");
+                    }
+                    else if (!args && /^\s+\[Return\]/.test(line)) {
+                        ret = line.replace(/(^\s+|\s+$)/g, "").replace("[Return]", "[RET]:").replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
+                        ret = args.replace(/\s/g, ", ").replace("]:,", "]:");
+                    }
+                }
+                else {
+                    if (args || ret) {
+                        if (!args) args = "";
+                        if (!ret) ret = "";
+                        return "{ " + args + " }, { " + ret + " }";
+                    }
+                    else {
+                        return "No Arguments and Return";
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public static getKeywordOrigin(document: vscode.TextDocument, keyword: string): vscode.Location {
         let result;
         try {
@@ -150,14 +186,14 @@ export class KeywordHelper {
     }
 
     public static getResourceKeywordByFileName(resources: vscode.TextDocument[], fileName: string): string[] {
-		for (let i = 0; i < resources.length; i++) {
-			let resName = Util.extractFileNameWithNoExtension(resources[i].fileName);
-			if (resName == fileName) {
-				return KeywordHelper.searchKeyword(resources[i]);
-			}
-		}
-		return null;
-	}
+        for (let i = 0; i < resources.length; i++) {
+            let resName = Util.extractFileNameWithNoExtension(resources[i].fileName);
+            if (resName == fileName) {
+                return KeywordHelper.searchKeyword(resources[i]);
+            }
+        }
+        return null;
+    }
 
     public static getKeywordDeclarationPosition(file: vscode.TextDocument, keyword: string): vscode.Range {
         for (let i = 0; i < file.lineCount; i++) {
