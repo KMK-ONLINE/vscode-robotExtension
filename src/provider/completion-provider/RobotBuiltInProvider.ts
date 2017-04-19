@@ -20,18 +20,19 @@ export class RobotBuiltInProvider implements CompletionItemProvider {
         "FOR        ${INDEX}        IN RANGE        ",
         "FOR       ${ELEMENT}        IN        @{",
     ]
-    
-    public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Thenable<CompletionItem[]> | CompletionItem[] {
-        let char = document.lineAt(position).text.charAt(position.character-1);
+
+    public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
+        : Thenable<CompletionItem[]> | CompletionItem[] {
+        let char = document.lineAt(position).text.charAt(position.character - 1);
         if (char == "*") {
             let sub = position.character - document.lineAt(position).firstNonWhitespaceCharacterIndex;
             let res = subArrayOfString(this.dictionary, sub);
             return stringArrayToCompletionItems(res, CompletionItemKind.Field);
         }
-        else if(char == "["){
+        else if (char == "[") {
             return stringArrayToCompletionItems(this.fieldDictionary, CompletionItemKind.Field);
         }
-        else{
+        else {
             return stringArrayToCompletionItems(this.controlDictionary, CompletionItemKind.Snippet);
         }
     }

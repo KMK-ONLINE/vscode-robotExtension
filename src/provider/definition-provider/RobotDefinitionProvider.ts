@@ -7,7 +7,8 @@ import { WorkspaceContext } from '../../WorkspaceContext';
 
 export class RobotDefinitionProvider implements DefinitionProvider {
 
-    public provideDefinition(document: TextDocument, position: Position, token: CancellationToken): Thenable<Definition> | ProviderResult<Definition> {
+    public provideDefinition(document: TextDocument, position: Position, token: CancellationToken)
+        : Thenable<Definition> | ProviderResult<Definition> {
         let args = {
             doc: document,
             pos: position
@@ -23,7 +24,7 @@ export class RobotDefinitionProvider implements DefinitionProvider {
                     return getKeywordOrigin(args.doc, key[0]);
                 }
             }
-            else if(variable != null && variable != ""){
+            else if (variable != null && variable != "") {
                 return searchGlobalVarOrigin(document, variable);
             }
             return null;

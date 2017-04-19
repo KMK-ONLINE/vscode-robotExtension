@@ -12,14 +12,42 @@ import { WorkspaceContext } from './WorkspaceContext';
 export function activate(context: vscode.ExtensionContext) {
 	console.log("robotf extension is running");
 	WorkspaceContext.scanWorkspace();
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('robot', new RobotBuiltInProvider(), "*", "[", ":"));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('robot', new RobotVariableCompletionProvider(), "$", "{"));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('robot', new RobotDotCompletionProvider(), "."));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('robot', new RobotCompletionProvider()));
-	context.subscriptions.push(vscode.languages.registerDefinitionProvider('robot', new RobotDefinitionProvider()));
-	context.subscriptions.push(vscode.languages.registerRenameProvider('robot', new RobotRenameProvider()));
-	context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(WorkspaceContext.scanWorkspace));
-	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(WorkspaceContext.scanWorkspace));
+	context.subscriptions.push(
+		vscode.languages.registerCompletionItemProvider(
+			'robot', new RobotBuiltInProvider(), "*", "[", ":"
+		)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerCompletionItemProvider(
+			'robot', new RobotVariableCompletionProvider(), "$", "{"
+		)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerCompletionItemProvider(
+			'robot', new RobotDotCompletionProvider(), "."
+		)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerCompletionItemProvider(
+			'robot', new RobotCompletionProvider()
+		)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerDefinitionProvider(
+			'robot', new RobotDefinitionProvider()
+		)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerRenameProvider(
+			'robot', new RobotRenameProvider()
+		)
+	);
+	context.subscriptions.push(
+		vscode.window.onDidChangeVisibleTextEditors(WorkspaceContext.scanWorkspace)
+	);
+	context.subscriptions.push(
+		vscode.window.onDidChangeActiveTextEditor(WorkspaceContext.scanWorkspace)
+	);
 }
 
 export function deactivate() {

@@ -5,7 +5,8 @@ import { TextDocument, Position, TextLine, RenameProvider, WorkspaceEdit, Provid
 import { getKeywordByPosition, getKeywordOrigin, getIncludedKeywordOrigin, getAllKeywordReferences } from '../../helper/KeywordHelper';
 
 export class RobotRenameProvider implements RenameProvider {
-    public provideRenameEdits(document: TextDocument, position: Position, newName: string, token: CancellationToken): ProviderResult<WorkspaceEdit> {
+    public provideRenameEdits(document: TextDocument, position: Position, newName: string, token: CancellationToken)
+        : ProviderResult<WorkspaceEdit> {
         let keyword = getKeywordByPosition(document, position);
         let key: string;
         let keywordOrigin: Location;
@@ -21,7 +22,9 @@ export class RobotRenameProvider implements RenameProvider {
             return null;
         }
         return Promise.resolve().then(() => {
-            let allLocation = getAllKeywordReferences(WorkspaceContext.getDocumentByUri(keywordOrigin.uri), key);
+            let allLocation = getAllKeywordReferences(
+                WorkspaceContext.getDocumentByUri(keywordOrigin.uri), key
+            );
             let editor = new WorkspaceEdit();
             for (let i = 0; i < allLocation.length; i++) {
                 let location = allLocation[i];

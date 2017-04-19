@@ -25,7 +25,8 @@ export function removeSamePath(a: string, b: string): string[] {
     return result;
 }
 
-export function stringArrayToCompletionItems(suggestions: string[], type: CompletionItemKind): CompletionItem[] {
+export function stringArrayToCompletionItems(suggestions: string[], type: CompletionItemKind)
+    : CompletionItem[] {
     let items: CompletionItem[] = [];
     suggestions = Array.from(new Set(suggestions));
     for (let i = 0; i < suggestions.length; i++) {

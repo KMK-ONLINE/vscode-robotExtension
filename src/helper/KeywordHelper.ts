@@ -19,11 +19,13 @@ export function getKeywordDefinition(location: Location): string {
             let isInKeyword = !(/^((([-_]*\w+\s?)+)|\*+)/.test(line));
             if (isInKeyword) {
                 if (!args && /^\s+\[Arguments\]/.test(line)) {
-                    args = line.replace(/(^\s+|\s+$)/g, "").replace("[Arguments]", "[ARGS]:").replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
+                    args = line.replace(/(^\s+|\s+$)/g, "").replace("[Arguments]", "[ARGS]:")
+                        .replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
                     args = args.replace(/\s/g, ", ").replace("]:,", "]:");
                 }
                 else if (!args && /^\s+\[Return\]/.test(line)) {
-                    ret = line.replace(/(^\s+|\s+$)/g, "").replace("[Return]", "[RET]:").replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
+                    ret = line.replace(/(^\s+|\s+$)/g, "").replace("[Return]", "[RET]:")
+                        .replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
                     ret = args.replace(/\s/g, ", ").replace("]:,", "]:");
                 }
             }
@@ -66,7 +68,8 @@ export function getKeywordOrigin(document: TextDocument, keyword: string): Locat
     }
 }
 
-export function getIncludedKeywordOrigin(document: TextDocument, file: string, keyword: string): Location {
+export function getIncludedKeywordOrigin(document: TextDocument, file: string, keyword: string)
+    : Location {
     let result;
     try {
         let resource = getResourceByName(file, document);
@@ -91,7 +94,13 @@ export function getAllKeywordReferences(document: TextDocument, keyword: string)
             let match = line.match(/^(([-_]*\w+\s?)+)\s*$/);
             if (match != null) {
                 if (match[1].replace(/\s+$/, '') == keyword) {
-                    locations.push(new Location(refference[i].uri, new Range(new Position(j, 0), new Position(j, keyLength))));
+                    locations.push(
+                        new Location(
+                            refference[i].uri, new Range(
+                                new Position(j, 0), new Position(j, keyLength)
+                            )
+                        )
+                    );
                 }
             }
             else {
@@ -101,13 +110,25 @@ export function getAllKeywordReferences(document: TextDocument, keyword: string)
                     if (keys.length == 1) {
                         let key = keys[0];
                         if (key == keyword) {
-                            locations.push(new Location(refference[i].uri, new Range(new Position(j, found), new Position(j, found + keyLength))));
+                            locations.push(
+                                new Location(
+                                    refference[i].uri, new Range(
+                                        new Position(j, found), new Position(j, found + keyLength)
+                                    )
+                                )
+                            );
                         }
                     }
                     else {
                         let key = keys[1];
                         if (key == keyword) {
-                            locations.push(new Location(refference[i].uri, new Range(new Position(j, found), new Position(j, found + keyLength))));
+                            locations.push(
+                                new Location(
+                                    refference[i].uri, new Range(
+                                        new Position(j, found), new Position(j, found + keyLength)
+                                    )
+                                )
+                            );
                         }
                     }
                 }

@@ -8,7 +8,8 @@ import { stringArrayToCompletionItems } from '../../Util';
 
 export class RobotDotCompletionProvider implements CompletionItemProvider {
 
-	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Thenable<CompletionItem[]> | CompletionItem[] {
+	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
+		: Thenable<CompletionItem[]> | CompletionItem[] {
 		let line = document.lineAt(position);
 		let keyword = getKeywordByPosition(document, position);
 		if (keyword != null) {
@@ -17,9 +18,11 @@ export class RobotDotCompletionProvider implements CompletionItemProvider {
 				return this.matchJustKeyword(document, keyword[0]);
 			}
 		}
-		else{
+		else {
 			let sub = position.character - line.firstNonWhitespaceCharacterIndex;
-			return [new CompletionItem("...		".substr(sub), CompletionItemKind.Snippet)]
+			return [
+				new CompletionItem("...		".substr(sub), CompletionItemKind.Snippet)
+			]
 		}
 	}
 

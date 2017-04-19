@@ -25,7 +25,12 @@ export function getResourceByName(resourceName: string, document: TextDocument):
     let files = allIncludedResources(document);
     files.push(document);
     for (let i = 0; i < files.length; i++) {
-        if (resourceName == extractFileNameWithNoExtension(files[i].fileName)) {
+        if (
+            resourceName == extractFileNameWithNoExtension(
+                files[i].fileName
+            )
+        ) 
+        {
             return files[i];
         }
     }
@@ -77,8 +82,11 @@ export function searchFileByName(files: TextDocument[], fileName: string): TextD
     return null;
 }
 
-export function searchDocumentOrigin(thisDocument: TextDocument, filePath: string): TextDocument {
-    return WorkspaceContext.getDocumentByPath(searchPathOrigin(thisDocument, filePath));
+export function searchDocumentOrigin(thisDocument: TextDocument, filePath: string)
+    : TextDocument {
+    return WorkspaceContext.getDocumentByPath(
+        searchPathOrigin(thisDocument, filePath)
+    );
 }
 
 export function searchPathOrigin(thisDocument: TextDocument, filePath: string): string {
@@ -98,7 +106,8 @@ export function documentsToNames(documents: TextDocument[]): string[] {
     return converted;
 }
 
-export function formatResource(thisDocument: TextDocument, start: string, path: string): string {
+export function formatResource(thisDocument: TextDocument, start: string, path: string)
+    : string {
     let filePath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "").replace(/\\/g, "/");
     path = path.replace(/\\/g, "/");
     let temp = removeSamePath(filePath, path);
@@ -110,7 +119,8 @@ export function formatResource(thisDocument: TextDocument, start: string, path: 
     return (start + temp[1]);
 }
 
-export function formatResources(thisDocument: TextDocument, start: string, path: string[]): string[] {
+export function formatResources(thisDocument: TextDocument, start: string, path: string[])
+    : string[] {
     let resourcesFormat: string[] = [];
     for (let i = 0; i < path.length; i++) {
         resourcesFormat.push(formatResource(thisDocument, start, path[i]));
@@ -120,6 +130,8 @@ export function formatResources(thisDocument: TextDocument, start: string, path:
 
 export function autoFormatResources(thisDocument: TextDocument, path: string[]): string[] {
     let resourcesFormat: string[] = [];
-    resourcesFormat = resourcesFormat.concat(formatResources(thisDocument, "Resource                  ", path));
+    resourcesFormat = resourcesFormat.concat(
+        formatResources(thisDocument, "Resource                  ", path)
+    );
     return resourcesFormat;
 }
