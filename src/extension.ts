@@ -7,6 +7,7 @@ import { RobotVariableCompletionProvider } from './provider/completion-provider/
 import { RobotBuiltInProvider } from './provider/completion-provider/RobotBuiltInProvider';
 import { RobotDefinitionProvider } from './provider/definition-provider/RobotDefinitionProvider';
 import { RobotRenameProvider } from './provider/rename-provider/RobotRenameProvider';
+import { RobotHoverProvider } from './provider/hover-provider/RobotHoverProvider';
 import { WorkspaceContext } from './WorkspaceContext';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -47,6 +48,11 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 	context.subscriptions.push(
 		vscode.window.onDidChangeActiveTextEditor(WorkspaceContext.scanWorkspace)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerHoverProvider(
+			'robot', new RobotHoverProvider()
+		)
 	);
 }
 

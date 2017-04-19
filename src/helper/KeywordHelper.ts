@@ -8,7 +8,7 @@ import { allIncludedResources, getResourceByName, getAllResourceRefferences } fr
 
 export function getKeywordDefinition(location: Location): string {
     let doc = WorkspaceContext.getDocumentByUri(location.uri);
-    let pos = location.range.start.character;
+    let pos = location.range.start.line;
     let line = doc.lineAt(pos).text;
     if (/^([-_]*\w+\s?)+\s*$/.test(line)) {
         let args: string;
@@ -19,24 +19,24 @@ export function getKeywordDefinition(location: Location): string {
             let isInKeyword = !(/^((([-_]*\w+\s?)+)|\*+)/.test(line));
             if (isInKeyword) {
                 if (!args && /^\s+\[Arguments\]/.test(line)) {
-                    args = line.replace(/(^\s+|\s+$)/g, "").replace("[Arguments]", "[ARGS]:")
+                    args = line.replace(/(^\s+|\s+$)/g, "").replace("[Arguments]", "ARGS:")
                         .replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
-                    args = args.replace(/\s/g, ", ").replace("]:,", "]:");
+                    args = args.replace(/\s/g, ", ").replace(":,", ":");
                 }
                 else if (!args && /^\s+\[Return\]/.test(line)) {
-                    ret = line.replace(/(^\s+|\s+$)/g, "").replace("[Return]", "[RET]:")
+                    ret = line.replace(/(^\s+|\s+$)/g, "").replace("[Return]", "RET:")
                         .replace("${", "").replace("}", "").replace(/\s{2,}/g, " ");
-                    ret = args.replace(/\s/g, ", ").replace("]:,", "]:");
+                    ret = args.replace(/\s/g, ", ").replace(":,", ":");
                 }
             }
             else {
                 if (args || ret) {
                     if (!args) args = "";
                     if (!ret) ret = "";
-                    return "{ " + args + " }, { " + ret + " }";
+                    return "[ " + args + " ], [ " + ret + " ]";
                 }
                 else {
-                    return "No Arguments and Return";
+                    return "No Arguments needed and No Return value";
                 }
             }
         }
@@ -45,7 +45,7 @@ export function getKeywordDefinition(location: Location): string {
 }
 
 export function getKeywordOrigin(document: TextDocument, keyword: string): Location {
-    let result;
+    let result = null;
     try {
         let resources = allIncludedResources(document);
         resources.push(document);

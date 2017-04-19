@@ -9,7 +9,7 @@ export function getVariableDefinition(location: Location): string {
     let line = doc.lineAt(location.range.start).text;
     let match = line.match(/^\$\{(([-_.]*\w+\s*)+)\}\s{2,}((\S+\s?)+)\s*$/);
     if (match) {
-        return match[2];
+        return match[3];
     }
 }
 
@@ -85,6 +85,7 @@ export function searchGlobalVarOrigin(document: TextDocument, varName: string): 
             }
         }
     }
+    return null;
 }
 
 export function getVariablesNames(document: TextDocument, match: string): string[] {

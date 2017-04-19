@@ -33,3 +33,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Fixed duplicated autocomplete
 ### Added
 - Added Global and Suite Variable definition
+
+## [1.3.1] 19-apr-17
+### Added
+- Added hover provider for global variable
+- Added hover provider for keyword

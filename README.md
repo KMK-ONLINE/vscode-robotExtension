@@ -42,6 +42,16 @@ This is visual studio extension for robot framework. this extension is still in 
 
 ![Keyword Rename](keyword-rename.png)
 
+* Variable Hover
+    * Hovering your mouse on global variable will give you the information about its initialization value
+
+![Variable Hover](variable-hover.png)
+
+* Keyword Hover
+    * Hovering your mouse on Keyword will give you the information about its Arguments and Return Value
+
+![Keyword Hover](keyword-hover.png)
+
 ## Requirements
 
 You need to have robotframework language support for visual studio code
@@ -78,3 +88,6 @@ Added definition provider
 
 ### 1.2.0
 Added rename provider
+
+### 1.3.1
+Added hover provider
