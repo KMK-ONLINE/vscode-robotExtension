@@ -2,8 +2,8 @@
 
 import { WorkspaceContext } from '../../WorkspaceContext';
 import { TextDocument, Position, TextLine, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
-import { allIncludedResources, formatResources, autoFormatResources, documentsToNames } from '../../helper/ResourceHelper';
-import { getKeywordByPosition, searchKeyword, searchAllIncludedKeyword, getKeywordLibrary } from '../../helper/KeywordHelper';
+import { searchAllResources, formatResources, formatFullResources, documentsToNames } from '../../helper/ResourceHelper';
+import { getKeywordByPosition, searchKeywords, searchAllKeywords, getAllKeywordLibrary } from '../../helper/KeywordHelper';
 import { stringArrayToCompletionItems } from '../../Util';
 import { SYNTAX } from '../../helper/KeywordDictionary';
 
@@ -35,12 +35,10 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private matchJustKeyword(document: TextDocument): CompletionItem[] {
-		let included = allIncludedResources(document);
-		let localKeywords = searchKeyword(document)
-		let includedKeywords = searchAllIncludedKeyword(included);
-		let libKeywords = getKeywordLibrary(
-			included.concat(document)
-		);
+		let included = searchAllResources(document);
+		let localKeywords = searchKeywords(document)
+		let includedKeywords = searchAllKeywords(included);
+		let libKeywords = getAllKeywordLibrary(document);
 		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
 		let keys = stringArrayToCompletionItems(allKeywords, CompletionItemKind.Function);
 		let all = keys.concat(
@@ -50,7 +48,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private matchKeyword(document: TextDocument): CompletionItem[] {
-		let included = allIncludedResources(document);
+		let included = searchAllResources(document);
 		let allFileNames = documentsToNames(included);
 		let files = stringArrayToCompletionItems(allFileNames, CompletionItemKind.Class);
 		let all = files.concat(this.matchJustKeyword(document));
@@ -65,7 +63,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 
 	private matchResource(document: TextDocument): CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
-		let includesFormat = autoFormatResources(document, resources);
+		let includesFormat = formatFullResources(document, resources);
 		let completionItem = stringArrayToCompletionItems(includesFormat, CompletionItemKind.File);
 		return [
 			new CompletionItem("Resource", CompletionItemKind.Keyword)

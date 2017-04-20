@@ -1,15 +1,48 @@
 'use strict';
 
 import { Location, TextDocument, Range, Position, TextLine, Uri } from 'vscode';
-import { extractFileNameWithNoExtension, removeSamePath } from '../Util';
+import { extractNameFromPath, removeSamePath } from '../Util';
 import { WorkspaceContext } from '../WorkspaceContext';
+
+export function getAllIncludedLibrary(file:TextDocument): string[]{
+    let included = searchAllResources(file).concat(file);
+    let allLibs: Set<string> = new Set();
+    for (let i = 0; i < included.length; i++) {
+        let libs = getIncludedLibrary(included[i]);
+        for (let j = 0; j < libs.length; j++) {
+            allLibs.add(libs[j]);
+        }
+    }
+    return Array.from(allLibs);
+}
+
+export function getIncludedLibrary(file: TextDocument): string[] {
+    let libs: string[] = [];
+    for (let i = 0; i < file.lineCount; i++) {
+        let match = file.lineAt(i).text.match(/^Library\s+(\w+)/);
+        if (match) {
+            libs.push(match[1]);
+        }
+    }
+    return libs;
+}
+
+export function searchMatchingFileName(resources: TextDocument[], fileName: string):TextDocument{
+    for (let i = 0; i < resources.length; i++) {
+        let resName = extractNameFromPath(resources[i].fileName);
+        if (resName == fileName) {
+            return resources[i];
+        }
+    }
+    return null;
+}
 
 export function getAllResourceRefferences(resource: TextDocument): TextDocument[] {
     let reff: Set<TextDocument> = new Set([resource]);
     let allDocs = WorkspaceContext.getAllDocuments();
     for (let i = 0; i < allDocs.length; i++) {
         if (allDocs[i] != resource) {
-            let included = allIncludedResources(allDocs[i]);
+            let included = searchAllResources(allDocs[i]);
             for (let j = 0; j < included.length; j++) {
                 if (included[j] == resource) {
                     reff.add(allDocs[i]);
@@ -21,12 +54,12 @@ export function getAllResourceRefferences(resource: TextDocument): TextDocument[
     return Array.from(reff);
 }
 
-export function getResourceByName(resourceName: string, document: TextDocument): TextDocument {
-    let files = allIncludedResources(document);
+export function getDocumentResourceByName(resourceName: string, document: TextDocument): TextDocument {
+    let files = searchAllResources(document);
     files.push(document);
     for (let i = 0; i < files.length; i++) {
         if (
-            resourceName == extractFileNameWithNoExtension(
+            resourceName == extractNameFromPath(
                 files[i].fileName
             )
         ) {
@@ -35,16 +68,16 @@ export function getResourceByName(resourceName: string, document: TextDocument):
     }
 }
 
-export function allIncludedResources(document: TextDocument): TextDocument[] {
-    let included = searchResource(document);
+export function searchAllResources(document: TextDocument): TextDocument[] {
+    let included = searchResources(document);
     let length = included.length;
     for (let i = 0; i < length; i++) {
-        let temp = searchResource(included[i])
+        let temp = searchResources(included[i])
         if (temp != null) {
             for (let j = 0; j < temp.length; j++) {
                 let indirectInclude: TextDocument[];
                 included.push(temp[j]);
-                indirectInclude = searchResource(temp[j]);
+                indirectInclude = searchResources(temp[j]);
                 if (indirectInclude != null) {
                     for (let k = 0; k < indirectInclude.length; k++) {
                         included.push(indirectInclude[k]);
@@ -56,14 +89,14 @@ export function allIncludedResources(document: TextDocument): TextDocument[] {
     return included;
 }
 
-export function searchResource(document: TextDocument): TextDocument[] {
+export function searchResources(document: TextDocument): TextDocument[] {
     let fileLength = document.lineCount;
     let resources: TextDocument[] = [];
     for (let i = 0; i < fileLength; i++) {
         let line = document.lineAt(i).text;
         let matches = line.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
         if (matches) {
-            let docs = searchDocumentOrigin(document, matches[1]);
+            let docs = searchOriginDocumentByRelativePath(document, matches[1]);
             if (docs != null) {
                 resources.push(docs);
             }
@@ -81,15 +114,15 @@ export function searchFileByName(files: TextDocument[], fileName: string): TextD
     return null;
 }
 
-export function searchDocumentOrigin(thisDocument: TextDocument, filePath: string)
+export function searchOriginDocumentByRelativePath(thisDocument: TextDocument, filePath: string)
     : TextDocument {
     return WorkspaceContext.getDocumentByPath(
-        searchPathOrigin(thisDocument, filePath)
+        searchOriginByRelativePath(thisDocument, filePath)
     );
 }
 
-export function searchPathOrigin(thisDocument: TextDocument, filePath: string): string {
-    let thisFolderPath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "");
+export function searchOriginByRelativePath(thisDocument: TextDocument, filePath: string): string {
+    let thisFolderPath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.?\w*$/, "");
     while (/^\.\.\.?\//.test(filePath)) {
         filePath = filePath.replace(/^\.\.\.?\//, "");
         thisFolderPath = thisFolderPath.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+(\/|\\)$/, "");
@@ -100,7 +133,7 @@ export function searchPathOrigin(thisDocument: TextDocument, filePath: string): 
 export function documentsToNames(documents: TextDocument[]): string[] {
     let converted: string[] = [];
     for (let i = 0; i < documents.length; i++) {
-        converted[i] = extractFileNameWithNoExtension(documents[i].fileName);
+        converted[i] = extractNameFromPath(documents[i].fileName);
     }
     return converted;
 }
@@ -127,7 +160,7 @@ export function formatResources(thisDocument: TextDocument, start: string, path:
     return resourcesFormat;
 }
 
-export function autoFormatResources(thisDocument: TextDocument, path: string[]): string[] {
+export function formatFullResources(thisDocument: TextDocument, path: string[]): string[] {
     let resourcesFormat: string[] = [];
     resourcesFormat = resourcesFormat.concat(
         formatResources(thisDocument, "Resource                  ", path)

@@ -2,8 +2,8 @@
 
 import { WorkspaceContext } from '../../WorkspaceContext';
 import { TextDocument, Position, TextLine, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
-import { allIncludedResources } from '../../helper/ResourceHelper';
-import { getKeywordByPosition, getResourceKeywordByFileName } from '../../helper/KeywordHelper';
+import { searchAllResources, searchMatchingFileName } from '../../helper/ResourceHelper';
+import { getKeywordByPosition, searchKeywords } from '../../helper/KeywordHelper';
 import { stringArrayToCompletionItems } from '../../Util';
 
 export class RobotDotCompletionProvider implements CompletionItemProvider {
@@ -27,8 +27,9 @@ export class RobotDotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private matchJustKeyword(document: TextDocument, fileName: string): CompletionItem[] {
-		let included = allIncludedResources(document);
-		let keywords = getResourceKeywordByFileName(included, fileName);
+		let included = searchAllResources(document);
+		let docs = searchMatchingFileName(included, fileName);
+		let keywords = searchKeywords(docs);
 		let completionItem = stringArrayToCompletionItems(keywords, CompletionItemKind.Function);
 		return completionItem;
 	}

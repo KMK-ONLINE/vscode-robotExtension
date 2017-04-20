@@ -2,7 +2,7 @@
 
 import { WorkspaceContext } from '../../WorkspaceContext';
 import { TextDocument, Position, TextLine, RenameProvider, WorkspaceEdit, ProviderResult, CancellationToken, Location } from 'vscode';
-import { getKeywordByPosition, getKeywordOrigin, getIncludedKeywordOrigin, getAllKeywordReferences } from '../../helper/KeywordHelper';
+import { getKeywordByPosition, getKeywordOrigin, searchKeywordOrigin, getAllKeywordReferences } from '../../helper/KeywordHelper';
 import { getVariableByPosition, getVariableOrigin, getAllVariableReference } from '../../helper/VariableHelper';
 
 export class RobotRenameProvider implements RenameProvider {
@@ -43,7 +43,7 @@ export class RobotRenameProvider implements RenameProvider {
             key = keyword[0];
         }
         else if (keyword.length == 2) {
-            keywordOrigin = getIncludedKeywordOrigin(document, keyword[0], keyword[1]);
+            keywordOrigin = searchKeywordOrigin(document, keyword[0], keyword[1]);
             key = keyword[1];
         }
         else {

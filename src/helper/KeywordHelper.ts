@@ -2,9 +2,9 @@
 
 import { Location, TextDocument, Range, Position, TextLine, Uri } from 'vscode';
 import { LIB } from './KeywordDictionary';
-import { extractFileNameWithNoExtension } from '../Util';
+import { extractNameFromPath } from '../Util';
 import { WorkspaceContext } from '../WorkspaceContext';
-import { allIncludedResources, getResourceByName, getAllResourceRefferences } from './ResourceHelper';
+import { getAllIncludedLibrary, getIncludedLibrary, searchAllResources, getDocumentResourceByName, getAllResourceRefferences } from './ResourceHelper';
 
 export function getKeywordDefinition(location: Location): string {
     let doc = WorkspaceContext.getDocumentByUri(location.uri);
@@ -47,12 +47,12 @@ export function getKeywordDefinition(location: Location): string {
 export function getKeywordOrigin(document: TextDocument, keyword: string): Location {
     let result = null;
     try {
-        let resources = allIncludedResources(document);
+        let resources = searchAllResources(document);
         resources.push(document);
         let resource: string;
         let position: Range;
         for (let i = 0; i < resources.length; i++) {
-            position = getKeywordDeclarationPosition(resources[i], keyword);
+            position = getKeywordDeclareRange(resources[i], keyword);
             if (position != null) {
                 resource = resources[i].fileName;
                 break;
@@ -68,12 +68,12 @@ export function getKeywordOrigin(document: TextDocument, keyword: string): Locat
     }
 }
 
-export function getIncludedKeywordOrigin(document: TextDocument, file: string, keyword: string)
+export function searchKeywordOrigin(document: TextDocument, file: string, keyword: string)
     : Location {
     let result;
     try {
-        let resource = getResourceByName(file, document);
-        let range = getKeywordDeclarationPosition(resource, keyword);
+        let resource = getDocumentResourceByName(file, document);
+        let range = getKeywordDeclareRange(resource, keyword);
         result = new Location(Uri.file(resource.fileName), range);
     }
     catch (e) {
@@ -138,15 +138,8 @@ export function getAllKeywordReferences(document: TextDocument, keyword: string)
     return locations;
 }
 
-export function getKeywordLibrary(included: TextDocument[]): string[] {
-    let allLibs: Set<string> = new Set();
-    for (let i = 0; i < included.length; i++) {
-        let libs = searchIncludedLibrary(included[i]);
-        for (let j = 0; j < libs.length; j++) {
-            allLibs.add(libs[j]);
-        }
-    }
-    let arrLibs = Array.from(allLibs);
+export function getAllKeywordLibrary(document: TextDocument): string[] {
+    let arrLibs = getAllIncludedLibrary(document);
     let keywords: string[] = [];
     for (let i = 0; i < arrLibs.length; i++) {
         for (let j = 0; j < LIB.length; j++) {
@@ -156,17 +149,6 @@ export function getKeywordLibrary(included: TextDocument[]): string[] {
         }
     }
     return keywords;
-}
-
-function searchIncludedLibrary(file: TextDocument): string[] {
-    let libs: string[] = [];
-    for (let i = 0; i < file.lineCount; i++) {
-        let match = file.lineAt(i).text.match(/^Library\s+(\w+)/);
-        if (match) {
-            libs.push(match[1]);
-        }
-    }
-    return libs;
 }
 
 export function getKeywordByPosition(document: TextDocument, position: Position): string[] {
@@ -190,35 +172,18 @@ export function getKeywordByPosition(document: TextDocument, position: Position)
             }
         }
         line = line.substr(index);
-        let match1 = line.match(/^(([-_]*\w+)+)\.((\w+\s?)*)/);
-        let match2 = line.match(/^((\w+\s?)+)(\s{2,})?$/);
-        if (match1) {
-            return [match1[1], match1[3].replace(/\s+$/, "")];
-        }
-        else if (match2) {
-            return [match2[1].replace(/\s+$/, "")];
-        }
-        else {
-            return null;
-        }
+        let sentences = line.split(/\s{2,}/)[0];
+        let keyword = sentences.split(".");
+        return keyword;
     }
 }
 
-export function getResourceKeywordByFileName(resources: TextDocument[], fileName: string): string[] {
-    for (let i = 0; i < resources.length; i++) {
-        let resName = extractFileNameWithNoExtension(resources[i].fileName);
-        if (resName == fileName) {
-            return searchKeyword(resources[i]);
-        }
-    }
-    return null;
-}
-
-export function getKeywordDeclarationPosition(file: TextDocument, keyword: string): Range {
+export function getKeywordDeclareRange(file: TextDocument, keyword: string): Range {
     for (let i = 0; i < file.lineCount; i++) {
-        if (/^([-_]*\w+\s?)+\s*$/.test(file.lineAt(i).text)) {
-            let match = file.lineAt(i).text.match(/^(([-_]*\w+\s?)+)\s*$/)
-            if (match[1].replace(/\s+$/, "") == keyword) {
+        let line = file.lineAt(i).text;
+        if (/^([-_]*|\w+\s?)+\s*$/.test(line)) {
+            let key = line.replace(/\s+$/, "")
+            if (key == keyword) {
                 return new Range(new Position(i, 0), new Position(i, keyword.length));
             }
         }
@@ -226,19 +191,19 @@ export function getKeywordDeclarationPosition(file: TextDocument, keyword: strin
     return null;
 }
 
-export function searchAllIncludedKeyword(files: TextDocument[]): string[] {
+export function searchAllKeywords(files: TextDocument[]): string[] {
     let keywords: string[] = [];
     for (let i = 0; i < files.length; i++) {
-        let fileKeywords = searchKeyword(files[i]);
+        let fileKeywords = searchKeywords(files[i]);
         if (fileKeywords.length > 0) {
-            let fileAndKeywords = mergeFileAndKeyword(files[i], fileKeywords);
+            let fileAndKeywords = mergeFileNameAndKeyword(files[i], fileKeywords);
             keywords = keywords.concat(fileAndKeywords);
         }
     }
     return keywords;
 }
 
-export function searchKeyword(file: TextDocument): string[] {
+export function searchKeywords(file: TextDocument): string[] {
     let keywords: string[] = [];
     let isInKeywordRange = false;
     for (let i = 0; i < file.lineCount; i++) {
@@ -262,9 +227,9 @@ export function searchKeyword(file: TextDocument): string[] {
     return keywords;
 }
 
-export function mergeFileAndKeyword(file: TextDocument, keywords: string[]): string[] {
+export function mergeFileNameAndKeyword(file: TextDocument, keywords: string[]): string[] {
     let merges: string[] = [];
-    let fileName = extractFileNameWithNoExtension(file.fileName);
+    let fileName = extractNameFromPath(file.fileName);
     for (let i = 0; i < keywords.length; i++) {
         merges.push(fileName + "." + keywords[i]);
     }

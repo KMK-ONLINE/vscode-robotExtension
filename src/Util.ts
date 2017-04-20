@@ -4,7 +4,7 @@ export function extractFileName(path: string): string {
     return path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
 }
 
-export function extractFileNameWithNoExtension(path: string): string {
+export function extractNameFromPath(path: string): string {
     return extractFileName(path).replace(/\.\w+$/, "");
 }
 

@@ -1,7 +1,7 @@
 'use strict';
-import { searchAllIncludedKeyword } from './KeywordHelper';
+import { searchAllKeywords } from './KeywordHelper';
 import { Location, TextDocument, Range, Position, TextLine, Uri } from 'vscode';
-import { allIncludedResources, getAllResourceRefferences } from './ResourceHelper';
+import { searchAllResources, getAllResourceRefferences } from './ResourceHelper';
 import { WorkspaceContext } from '../WorkspaceContext';
 
 export function getAllVariableReference(document: TextDocument, variable: string, position: Position)
@@ -176,7 +176,7 @@ export function getVariableByPosition(document: TextDocument, position: Position
 }
 
 export function getVariableOrigin(document: TextDocument, varName: string): Location {
-    let included = allIncludedResources(document);
+    let included = searchAllResources(document);
     let all = [document].concat(included);
     let isInVarRange = false;
     for (let i = 0; i < all.length; i++) {
@@ -229,7 +229,7 @@ export function getVariableOrigin(document: TextDocument, varName: string): Loca
 }
 
 export function getVariablesNames(document: TextDocument, match: string): string[] {
-    let included = allIncludedResources(document);
+    let included = searchAllResources(document);
     let allVariablesNames = allAvailableVariables(document, included);
     return Array.from(new Set(allVariablesNames));
 }
