@@ -2,7 +2,7 @@
 
 import { getVariableOrigin, getVariableByPosition } from '../../helper/VariableHelper';
 import { TextDocument, Position, TextLine, Definition, DefinitionProvider, ProviderResult, CancellationToken } from 'vscode';
-import { getKeywordByPosition, searchKeywordOrigin, getKeywordOrigin } from '../../helper/KeywordHelper';
+import { getKeywordByPosition, searchKeywordLocation, getKeywordOrigin } from '../../helper/KeywordHelper';
 import { WorkspaceContext } from '../../WorkspaceContext';
 
 export class RobotDefinitionProvider implements DefinitionProvider {
@@ -18,7 +18,7 @@ export class RobotDefinitionProvider implements DefinitionProvider {
             let variable = getVariableByPosition(args.doc, args.pos);
             if (key != null) {
                 if (key.length == 2) {
-                    return searchKeywordOrigin(args.doc, key[0], key[1]);
+                    return searchKeywordLocation(args.doc, key[0], key[1]);
                 }
                 else {
                     return getKeywordOrigin(args.doc, key[0]);

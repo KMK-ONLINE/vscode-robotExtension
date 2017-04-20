@@ -68,7 +68,7 @@ export function getKeywordOrigin(document: TextDocument, keyword: string): Locat
     }
 }
 
-export function searchKeywordOrigin(document: TextDocument, file: string, keyword: string)
+export function searchKeywordLocation(document: TextDocument, file: string, keyword: string)
     : Location {
     let result;
     try {
