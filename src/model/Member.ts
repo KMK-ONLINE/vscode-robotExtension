@@ -17,6 +17,10 @@ export class Member {
         return this._name;
     }
 
+    get location() {
+        return this._location;
+    }
+
     public editName(name: string, editor: WorkspaceEdit): WorkspaceEdit {
         replace(this.location, name, editor);
         let line = this.location.range.start.line;
@@ -25,10 +29,6 @@ export class Member {
         this._name = name;
         this._location.range = new Range(start, end);
         return editor;
-    }
-
-    get location() {
-        return this._location;
     }
 
     public isEqual(member: Member): boolean {

@@ -13,20 +13,20 @@ export class RobotVariableCompletionProvider implements CompletionItemProvider {
         let lastWhite = this.searchDollar(line, position);
         let subLine = line.substr(lastWhite);
         let thisDoc = RobotDoc.parseDocument(document);
-        let vars = thisDoc.allAvailableVariableNames;
+        let vars = thisDoc.allAvailableVariablesName;
         if (/^\$\{/.test(subLine)) {
             return stringArrayToCompletionItems(vars, CompletionItemKind.Variable);
         }
-        else if(/^\$/.test(subLine)){
+        else if (/^\$/.test(subLine)) {
             let suggestion = formatVariables(vars);
             return stringArrayToCompletionItems(suggestion, CompletionItemKind.Variable);
         }
         return null;
     }
 
-    private searchDollar(line:string, position:Position):number{
-        for(let i = position.character; i >= 0; i--){
-            if(line.charAt(i) == "$"){
+    private searchDollar(line: string, position: Position): number {
+        for (let i = position.character; i >= 0; i--) {
+            if (line.charAt(i) == "$") {
                 return i;
             }
         }

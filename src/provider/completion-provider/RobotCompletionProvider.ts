@@ -32,9 +32,11 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 
 	private matchKeyword(document: TextDocument): CompletionItem[] {
 		let thisDoc = RobotDoc.parseDocument(document);
-		let included = stringArrayToCompletionItems(thisDoc.allResourceNames, CompletionItemKind.Class);
-		let localKeyComplete = stringArrayToCompletionItems(thisDoc.keywordNames, CompletionItemKind.Function);
-		let keyComplete = stringArrayToCompletionItems(thisDoc.allAvailableKeywordFullNames, CompletionItemKind.Function);
+		let included = stringArrayToCompletionItems(thisDoc.allResourcesName, CompletionItemKind.Class);
+		let localKeyComplete = stringArrayToCompletionItems(thisDoc.keywordsName, CompletionItemKind.Function);
+		let keyComplete = stringArrayToCompletionItems(
+			thisDoc.allAvailableKeywordsFullName, CompletionItemKind.Function
+		);
 		let otherKey = this.getLibAndSyntax(thisDoc);
 		return included.concat(otherKey, localKeyComplete, keyComplete);
 	}

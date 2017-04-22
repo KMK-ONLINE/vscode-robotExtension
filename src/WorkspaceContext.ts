@@ -57,7 +57,9 @@ export class WorkspaceContext {
                     WorkspaceContext.asyncReadingCounter--;
                     if (WorkspaceContext.asyncReadingCounter == 1) {
                         WorkspaceContext.allDoc = WorkspaceContext.temp;
-                        console.log("finished scanning " + WorkspaceContext.allDoc.length + " robot and txt document");
+                        console.log(
+                            "finished scanning " + WorkspaceContext.allDoc.length + " robot and txt document"
+                        );
                         WorkspaceContext.asyncReadingCounter = 0;
                     }
                 }, (reason) => {
@@ -65,7 +67,9 @@ export class WorkspaceContext {
                     WorkspaceContext.asyncReadingCounter--;
                     if (WorkspaceContext.asyncReadingCounter == 1) {
                         WorkspaceContext.allDoc = WorkspaceContext.temp;
-                        console.log("finished scanning " + WorkspaceContext.allDoc.length + " robot and txt document");
+                        console.log(
+                            "finished scanning " + WorkspaceContext.allDoc.length + " robot and txt document"
+                        );
                         WorkspaceContext.asyncReadingCounter = 0;
                     }
                 });

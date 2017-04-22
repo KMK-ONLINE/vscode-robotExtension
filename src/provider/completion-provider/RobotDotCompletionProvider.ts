@@ -25,7 +25,7 @@ export class RobotDotCompletionProvider implements CompletionItemProvider {
 
 	private matchJustKeyword(document: TextDocument, fileName: string): CompletionItem[] {
 		let doc = RobotDoc.parseDocument(document);
-		let keywords = doc.getKeywordNameByResourceName(fileName);
+		let keywords = doc.getKeywordsNameByResourceName(fileName);
 		let completionItem = stringArrayToCompletionItems(keywords, CompletionItemKind.Function);
 		return completionItem;
 	}

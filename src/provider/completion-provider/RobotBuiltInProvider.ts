@@ -4,7 +4,7 @@ import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, Com
 import { subArrayOfString, stringArrayToCompletionItems } from '../../Util';
 
 export class RobotBuiltInProvider implements CompletionItemProvider {
-    
+
     private dictionary: string[] = [
         "*** Variable ***\n",
         "*** Settings ***\n",

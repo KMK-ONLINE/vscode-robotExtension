@@ -15,12 +15,37 @@ export class Variable extends Member {
         this._isOrigin = isOrigin;
     }
 
-    public static parseVariable(document: TextDocument, name: string, isOrigin: boolean, line: number, start: number): Variable {
+    public static parseVariable(document: TextDocument, name: string, isOrigin: boolean, line: number, start: number)
+        : Variable {
         let startPos = new Position(line, start)
         let endPos = new Position(line, start + name.length);
         let range = new Range(startPos, endPos);
         let loc = new Location(document.uri, range);
         return new Variable(name, loc, isOrigin);
+    }
+
+    get value(): string {
+        return this._value;
+    }
+
+    set value(value: string) {
+        this._value = value;
+    }
+
+    get isGlobal(): boolean {
+        return this._isGlobal;
+    }
+
+    set isGlobal(isGlobal: boolean) {
+        this._isGlobal = isGlobal;
+    }
+
+    get isOrigin(): boolean {
+        return this._isOrigin
+    }
+
+    set isOrigin(isOrigin: boolean) {
+        this._isOrigin = isOrigin;
     }
 
     get origin(): Variable {
@@ -33,7 +58,7 @@ export class Variable extends Member {
             let allResources = [robotDoc].concat(robotDoc.allResources);
             for (let i = 0; i < allResources.length; i++) {
                 let resource = allResources[i];
-                let defines = resource.definesVariables;
+                let defines = resource.variableDefinitions;
                 for (let j = 0; j < defines.length; j++) {
                     let define = defines[j];
                     if (define.name == this.name) {
@@ -78,29 +103,5 @@ export class Variable extends Member {
             return result;
         }
         return [];
-    }
-
-    get isOrigin(): boolean {
-        return this._isOrigin
-    }
-
-    set isOrigin(isOrigin: boolean) {
-        this._isOrigin = isOrigin;
-    }
-
-    set value(value: string) {
-        this._value = value;
-    }
-
-    get value(): string {
-        return this._value;
-    }
-
-    get isGlobal(): boolean {
-        return this._isGlobal;
-    }
-
-    set isGlobal(isGlobal: boolean) {
-        this._isGlobal = isGlobal;
     }
 }

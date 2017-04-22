@@ -16,7 +16,9 @@ export class RobotDoc {
     private _doc: TextDocument;
     private _resources: TextDocument[];
 
-    private constructor(document: TextDocument, keywords: Keyword[], variables: Variable[], resources: TextDocument[]) {
+    private constructor(
+        document: TextDocument, keywords: Keyword[], variables: Variable[], resources: TextDocument[]
+    ) {
         this._doc = document;
         this._keywords = keywords;
         this._variables = variables;
@@ -30,6 +32,162 @@ export class RobotDoc {
         let result = new RobotDoc(document, keywords, variables, resources);
         result.assignGlobalVariables();
         return result;
+    }
+
+    get name() {
+        let path = this.document.fileName;
+        let nameWithExtension = path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
+        return nameWithExtension.replace(/\.\w+$/, "");
+    }
+
+    get variables() {
+        return this._variables;
+    }
+
+    get variableDefinitions() {
+        let defines: Variable[] = [];
+        let variables = this.variables;
+        for (let i = 0; i < variables.length; i++) {
+            if (variables[i].isOrigin) {
+                defines.push(variables[i]);
+            }
+        }
+        return defines;
+    }
+
+    get usedVariables() {
+        let used: Variable[] = [];
+        let variables = this.variables;
+        for (let i = 0; i < variables.length; i++) {
+            if (!(variables[i].isOrigin)) {
+                used.push(variables[i]);
+            }
+        }
+        return used;
+    }
+
+    get availableVariablesName(): string[] {
+        let docVarNames: Set<string> = new Set();
+        let variables = this.variables;
+        for (let i = 0; i < variables.length; i++) {
+            docVarNames.add(variables[i].name);
+        }
+        return Array.from(docVarNames);
+    }
+
+    get allAvailableVariablesName(): string[] {
+        let varNames: Set<string> = new Set(this.availableVariablesName);
+        let resources = this.allResources;
+        for (let i = 0; i < resources.length; i++) {
+            let resource = resources[i];
+            let variables = resource.variableDefinitions;
+            for (let j = 0; j < variables.length; j++) {
+                let name = variables[j].name;
+                varNames.add(name);
+            }
+        }
+        return Array.from(varNames);
+    }
+
+    get keywords() {
+        return this._keywords;
+    }
+
+    get keywordsName() {
+        let keywords = this.keywords;
+        let result: string[] = [];
+        for (let i = 0; i < keywords.length; i++) {
+            result.push(keywords[i].name);
+        }
+        return result;
+    }
+
+    get allAvailableKeywordsFullName(): string[] {
+        let keyNames: string[] = [];
+        let resources = this.allResources;
+        for (let i = 0; i < resources.length; i++) {
+            let resource = resources[i];
+            let keywords = resource.keywords;
+            for (let j = 0; j < keywords.length; j++) {
+                let key = keywords[j]
+                let name = key.name;
+                let fullName = keywords[j].fullName;
+                keyNames.push(name);
+                keyNames.push(fullName);
+            }
+        }
+        return keyNames;
+    }
+
+    get allAvailableKeywordsName(): string[] {
+        let keyNames: string[] = [];
+        let resources = this.allResources;
+        for (let i = 0; i < resources.length; i++) {
+            let resource = resources[i];
+            let keywords = resource.keywords;
+            for (let j = 0; j < keywords.length; j++) {
+                let name = keywords[i].name;
+                keyNames.push(name);
+            }
+        }
+        return keyNames;
+    }
+
+    get document() {
+        return this._doc;
+    }
+
+    get resources() {
+        let res: RobotDoc[] = [];
+        for (let i = 0; i < this._resources.length; i++) {
+            let resource = RobotDoc.parseDocument(this._resources[i]);
+            res.push(resource);
+        }
+        return res;
+    }
+
+    get rawResources() {
+        return this._resources;
+    }
+
+    get allResources() {
+        let container: RobotDoc[] = [this];
+        container = this.scanResources(container);
+        return container;
+    }
+
+    get allResourcesName() {
+        let resources = this.allResources;
+        let result: string[] = [];
+        for (let i = 0; i < resources.length; i++) {
+            result.push(resources[i].name);
+        }
+        return result;
+    }
+
+    get library(): string[] {
+        let libs: string[] = [];
+        let resources = this.allResources;
+        let added: boolean[] = new Array(LIB.length);
+        let addedLength = LIB.length;
+        for (let i = 0; i < resources.length && addedLength > 0; i++) {
+            let resource = resources[i].document;
+            for (let i = 0; i < resource.lineCount; i++) {
+                let match = resource.lineAt(i).text.match(/^Library\s+(\w+)/);
+                if (match) {
+                    for (let j = 0; j < LIB.length; j++) {
+                        if (!added[j]) {
+                            if (LIB[j].name == match[i]) {
+                                libs = libs.concat(LIB[j].key);
+                                addedLength--;
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        return libs;
     }
 
     public getVariableByPosition(position: Position): Variable {
@@ -76,50 +234,59 @@ export class RobotDoc {
         }
     }
 
-    get name() {
-        let path = this.document.fileName;
-        let nameWithExtension = path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
-        return nameWithExtension.replace(/\.\w+$/, "");
+    public getKeywordsByName(fileName: string) {
+        let resources = this.resources;
+        for (let i = 0; i < resources.length; i++) {
+            if (resources[i].name == fileName) {
+                return resources[i].keywords;
+            }
+        }
+        return [];
     }
 
-    get keywords() {
-        return this._keywords;
+    public getKeywordsNameByResourceName(fileName: string) {
+        let resources = this.allResources;
+        for (let i = 0; i < resources.length; i++) {
+            if (resources[i].name == fileName) {
+                return resources[i].keywordsName;
+            }
+        }
+        return [];
     }
 
-    get keywordNames() {
-        let keywords = this.keywords;
-        let result: string[] = [];
-        for (let i = 0; i < keywords.length; i++) {
-            result.push(keywords[i].name);
+    public searchVariables(name: string): Variable[] {
+        let result = [];
+        let variables = this.variables;
+        for (let i = 0; i < variables.length; i++) {
+            if (variables[i].name == name) {
+                result.push(variables[i]);
+            }
         }
         return result;
     }
 
-    get document() {
-        return this._doc;
-    }
-
-    get variables() {
-        return this._variables;
-    }
-
-    get resources() {
-        let res: RobotDoc[] = [];
-        for (let i = 0; i < this._resources.length; i++) {
-            let resource = RobotDoc.parseDocument(this._resources[i]);
-            res.push(resource);
+    public isVariableExist(name: string): boolean {
+        let docVarNames = this.availableVariablesName;
+        for (let i = 0; i < docVarNames.length; i++) {
+            if (docVarNames[i] == name) {
+                return true;
+            }
         }
-        return res;
+        return false;
+    }
+
+    public isEqual(doc: RobotDoc): boolean {
+        return this._doc.uri.fsPath == doc.document.uri.fsPath;
     }
 
     private assignGlobalVariables() {
         let variables = this.usedVariables;
         let included = this.allResources;
-        let defines = this.definesVariables;
+        let defines = this.variableDefinitions;
         for (let i = 0; i < included.length; i++) {
             let resource = included[i];
             if (!(resource.isEqual(this))) {
-                let resDefines = resource.definesVariables;
+                let resDefines = resource.variableDefinitions;
                 defines = defines.concat(resDefines);
             }
         }
@@ -134,167 +301,6 @@ export class RobotDoc {
                 }
             }
         }
-    }
-
-    get definesVariables() {
-        let defines: Variable[] = [];
-        let variables = this.variables;
-        for (let i = 0; i < variables.length; i++) {
-            if (variables[i].isOrigin) {
-                defines.push(variables[i]);
-            }
-        }
-        return defines;
-    }
-
-    get usedVariables() {
-        let used: Variable[] = [];
-        let variables = this.variables;
-        for (let i = 0; i < variables.length; i++) {
-            if (!(variables[i].isOrigin)) {
-                used.push(variables[i]);
-            }
-        }
-        return used;
-    }
-
-    get allAvailableVariableNames(): string[] {
-        let varNames: Set<string> = new Set(this.availableVariableNames);
-        let resources = this.allResources;
-        for (let i = 0; i < resources.length; i++) {
-            let resource = resources[i];
-            let variables = resource.definesVariables;
-            for (let j = 0; j < variables.length; j++) {
-                let name = variables[j].name;
-                varNames.add(name);
-            }
-        }
-        return Array.from(varNames);
-    }
-
-    get allAvailableKeywordFullNames(): string[] {
-        let keyNames: string[] = [];
-        let resources = this.allResources;
-        for (let i = 0; i < resources.length; i++) {
-            let resource = resources[i];
-            let keywords = resource.keywords;
-            for (let j = 0; j < keywords.length; j++) {
-                let key = keywords[j]
-                let name = key.name;
-                let fullName = keywords[j].fullName;
-                keyNames.push(name);
-                keyNames.push(fullName);
-            }
-        }
-        return keyNames;
-    }
-
-    get allAvailableKeywordNames(): string[] {
-        let keyNames: string[] = [];
-        let resources = this.allResources;
-        for (let i = 0; i < resources.length; i++) {
-            let resource = resources[i];
-            let keywords = resource.keywords;
-            for (let j = 0; j < keywords.length; j++) {
-                let name = keywords[i].name;
-                keyNames.push(name);
-            }
-        }
-        return keyNames;
-    }
-
-    get library(): string[] {
-        let libs: string[] = [];
-        let resources = this.allResources;
-        let added: boolean[] = new Array(LIB.length);
-        let addedLength = LIB.length;
-        for (let i = 0; i < resources.length && addedLength > 0; i++) {
-            let resource = resources[i].document;
-            for (let i = 0; i < resource.lineCount; i++) {
-                let match = resource.lineAt(i).text.match(/^Library\s+(\w+)/);
-                if (match) {
-                    for (let j = 0; j < LIB.length; j++) {
-                        if (!added[j]) {
-                            if (LIB[j].name == match[i]) {
-                                libs = libs.concat(LIB[j].key);
-                                addedLength--;
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-        return libs;
-    }
-
-    public getKeywordsByName(fileName: string) {
-        let resources = this.resources;
-        for (let i = 0; i < resources.length; i++) {
-            if (resources[i].name == fileName) {
-                return resources[i].keywords;
-            }
-        }
-        return [];
-    }
-
-    public getKeywordNameByResourceName(fileName: string) {
-        let resources = this.allResources;
-        for (let i = 0; i < resources.length; i++) {
-            if (resources[i].name == fileName) {
-                return resources[i].keywordNames;
-            }
-        }
-        return [];
-    }
-
-    get availableVariableNames(): string[] {
-        let docVarNames: Set<string> = new Set();
-        let variables = this.variables;
-        for (let i = 0; i < variables.length; i++) {
-            docVarNames.add(variables[i].name);
-        }
-        return Array.from(docVarNames);
-    }
-
-    public isVariableExist(name: string): boolean {
-        let docVarNames = this.availableVariableNames;
-        for (let i = 0; i < docVarNames.length; i++) {
-            if (docVarNames[i] == name) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public searchVariables(name: string): Variable[] {
-        let result = [];
-        let variables = this.variables;
-        for (let i = 0; i < variables.length; i++) {
-            if (variables[i].name == name) {
-                result.push(variables[i]);
-            }
-        }
-        return result;
-    }
-
-    get rawResources() {
-        return this._resources;
-    }
-
-    get allResources() {
-        let container: RobotDoc[] = [this];
-        container = this.scanResources(container);
-        return container;
-    }
-
-    get allResourceNames(){
-        let resources = this.allResources;
-        let result: string[] = [];
-        for(let i = 0; i < resources.length; i++){
-            result.push(resources[i].name);
-        }
-        return result;
     }
 
     private scanResources(container: RobotDoc[]): RobotDoc[] {
@@ -317,9 +323,5 @@ export class RobotDoc {
             }
         }
         return container;
-    }
-
-    public isEqual(doc: RobotDoc): boolean {
-        return this._doc.uri.fsPath == doc.document.uri.fsPath;
     }
 }
