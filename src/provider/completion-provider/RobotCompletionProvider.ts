@@ -1,18 +1,19 @@
 'use strict';
 
 import { WorkspaceContext } from '../../WorkspaceContext';
-import { TextDocument, Position, TextLine, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
-import { searchAllResources, formatResources, formatFullResources, documentsToNames } from '../../helper/ResourceHelper';
-import { getKeywordByPosition, searchKeywords, searchAllKeywords, getAllKeywordLibrary } from '../../helper/KeywordHelper';
+import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
+import { formatResources, formatFullResources } from '../../helper/ResourceHelper';
+import { getDocKeyByPos } from '../../helper/KeywordHelper';
 import { stringArrayToCompletionItems } from '../../Util';
-import { SYNTAX } from '../../helper/KeywordDictionary';
+import { SYNTAX } from '../../dictionary/KeywordDictionary';
+import { RobotDoc } from '../../model/RobotDoc';
 
 export class RobotCompletionProvider implements CompletionItemProvider {
 
 	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
 		: Thenable<CompletionItem[]> | CompletionItem[] {
 		let line = document.lineAt(position);
-		let keyword = getKeywordByPosition(document, position);
+		let keyword = getDocKeyByPos(document, position);
 		let resourceMatcher1 = line.text.match(/^([rR][eE]?[sS]?[oO]?[uU]?[rR]?[cC]?[eE]?)$/);
 		let resourceMatcher2 = line.text.match(/^Resource\s{2,}(([-_]+|\w+)+)\s*$/);
 		if (resourceMatcher1) {
@@ -22,37 +23,26 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 			return this.completeResource(document);
 		}
 		else if (keyword != null) {
-			if (keyword.length == 1) {
-				return this.matchKeyword(document);
-			}
-			else {
-				return this.matchJustKeyword(document);
-			}
+			return this.matchKeyword(document);
 		}
 		else {
 			return stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
 		}
 	}
 
-	private matchJustKeyword(document: TextDocument): CompletionItem[] {
-		let included = searchAllResources(document);
-		let localKeywords = searchKeywords(document)
-		let includedKeywords = searchAllKeywords(included);
-		let libKeywords = getAllKeywordLibrary(document);
-		let allKeywords = localKeywords.concat(includedKeywords, libKeywords);
-		let keys = stringArrayToCompletionItems(allKeywords, CompletionItemKind.Function);
-		let all = keys.concat(
-			stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword)
-		);
-		return Array.from(new Set(all));
+	private matchKeyword(document: TextDocument): CompletionItem[] {
+		let thisDoc = RobotDoc.parseDocument(document);
+		let included = stringArrayToCompletionItems(thisDoc.allResourceNames, CompletionItemKind.Class);
+		let localKeyComplete = stringArrayToCompletionItems(thisDoc.keywordNames, CompletionItemKind.Function);
+		let keyComplete = stringArrayToCompletionItems(thisDoc.allAvailableKeywordFullNames, CompletionItemKind.Function);
+		let otherKey = this.getLibAndSyntax(thisDoc);
+		return included.concat(otherKey, localKeyComplete, keyComplete);
 	}
 
-	private matchKeyword(document: TextDocument): CompletionItem[] {
-		let included = searchAllResources(document);
-		let allFileNames = documentsToNames(included);
-		let files = stringArrayToCompletionItems(allFileNames, CompletionItemKind.Class);
-		let all = files.concat(this.matchJustKeyword(document));
-		return Array.from(new Set(all));
+	private getLibAndSyntax(doc: RobotDoc): CompletionItem[] {
+		let libKey = stringArrayToCompletionItems(doc.library, CompletionItemKind.Function)
+		let syntax = stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
+		return libKey.concat(syntax);;
 	}
 
 	private completeResource(document: TextDocument): CompletionItem[] {

@@ -1,5 +1,6 @@
-import { resolve } from 'dns';
-import { workspace, Location, TextDocument, Range, Position, TextLine, Uri } from 'vscode';
+'use strict'
+
+import { workspace, TextDocument, Uri } from 'vscode';
 import fs = require('fs');
 
 export class WorkspaceContext {
@@ -8,6 +9,10 @@ export class WorkspaceContext {
     private static allPath: string[] = [];
     private static asyncReadingCounter: number = 0;
     private static temp: TextDocument[];
+
+    public static size(): number {
+        return WorkspaceContext.allDoc.length;
+    }
 
     public static getAllDocuments(): TextDocument[] {
         return WorkspaceContext.allDoc;

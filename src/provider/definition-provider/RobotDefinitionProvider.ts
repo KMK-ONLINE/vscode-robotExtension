@@ -1,31 +1,21 @@
 'use strict';
 
-import { getVariableOrigin, getVariableByPosition } from '../../helper/VariableHelper';
-import { TextDocument, Position, TextLine, Definition, DefinitionProvider, ProviderResult, CancellationToken } from 'vscode';
-import { getKeywordByPosition, searchKeywordLocation, getKeywordOrigin } from '../../helper/KeywordHelper';
-import { WorkspaceContext } from '../../WorkspaceContext';
+import { RobotDoc } from '../../model/RobotDoc';
+import { TextDocument, Position, Definition, DefinitionProvider, ProviderResult, CancellationToken } from 'vscode';
 
 export class RobotDefinitionProvider implements DefinitionProvider {
 
     public provideDefinition(document: TextDocument, position: Position, token: CancellationToken)
         : Thenable<Definition> | ProviderResult<Definition> {
-        let args = {
-            doc: document,
-            pos: position
-        }
-        return Promise.resolve(args).then((args) => {
-            let key = getKeywordByPosition(args.doc, args.pos);
-            let variable = getVariableByPosition(args.doc, args.pos);
-            if (key != null) {
-                if (key.length == 2) {
-                    return searchKeywordLocation(args.doc, key[0], key[1]);
-                }
-                else {
-                    return getKeywordOrigin(args.doc, key[0]);
-                }
+        return Promise.resolve().then(() => {
+            let thisDoc = RobotDoc.parseDocument(document);
+            let variable = thisDoc.getVariableByPosition(position);
+            let keyword = thisDoc.getKeywordByPosition(position);
+            if (keyword != null) {
+                return keyword.location;
             }
-            else if (variable != null && variable != "") {
-                return getVariableOrigin(document, variable);
+            else if (variable != null) {
+                return variable.location;
             }
             return null;
         });

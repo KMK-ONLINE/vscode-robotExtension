@@ -1,9 +1,10 @@
 'use strict';
 
-import { TextDocument, Position, TextLine, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
+import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
 import { subArrayOfString, stringArrayToCompletionItems } from '../../Util';
 
 export class RobotBuiltInProvider implements CompletionItemProvider {
+    
     private dictionary: string[] = [
         "*** Variable ***\n",
         "*** Settings ***\n",

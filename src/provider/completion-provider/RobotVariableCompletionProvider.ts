@@ -1,26 +1,26 @@
 'use strict';
 
+import { RobotDoc } from '../../model/RobotDoc';
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
 import { stringArrayToCompletionItems } from '../../Util';
-import { WorkspaceContext } from '../../WorkspaceContext';
-import { getVariablesNames, getVariables } from '../../helper/VariableHelper';
+import { formatVariables } from '../../helper/VariableHelper';
 
 export class RobotVariableCompletionProvider implements CompletionItemProvider {
 
     public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
         : Thenable<CompletionItem[]> | CompletionItem[] {
-        let line = document.lineAt(position);
-        let matcher1 = line.text.match(/\$\{(\w*\s*[-_]*)\}/);
-        let matcher2 = line.text.match(/(\$\{?(\w*\s*[-_]*))(\s+|$)/);
-        if (matcher1) {
-            return stringArrayToCompletionItems(
-                getVariablesNames(document, matcher1[1]), CompletionItemKind.Variable
-            );
+        let line = document.lineAt(position).text;
+        let lastWhite = document.lineAt(position).firstNonWhitespaceCharacterIndex;
+        let subLine = line.substr(lastWhite);
+        let thisDoc = RobotDoc.parseDocument(document);
+        let vars = thisDoc.allAvailableVariableNames;
+        if (/^\$\{/.test(subLine)) {
+            return stringArrayToCompletionItems(vars, CompletionItemKind.Variable);
         }
-        else if (matcher2) {
-            return stringArrayToCompletionItems(
-                getVariables(document, matcher2[2]), CompletionItemKind.Variable
-            );
+        else if(/^\$/.test(subLine)){
+            let suggestion = formatVariables(vars);
+            return stringArrayToCompletionItems(suggestion, CompletionItemKind.Variable);
         }
+        return null;
     }
 }
