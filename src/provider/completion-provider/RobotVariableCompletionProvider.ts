@@ -10,7 +10,7 @@ export class RobotVariableCompletionProvider implements CompletionItemProvider {
     public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
         : Thenable<CompletionItem[]> | CompletionItem[] {
         let line = document.lineAt(position).text;
-        let lastWhite = document.lineAt(position).firstNonWhitespaceCharacterIndex;
+        let lastWhite = this.searchDollar(line, position);
         let subLine = line.substr(lastWhite);
         let thisDoc = RobotDoc.parseDocument(document);
         let vars = thisDoc.allAvailableVariableNames;
@@ -22,5 +22,14 @@ export class RobotVariableCompletionProvider implements CompletionItemProvider {
             return stringArrayToCompletionItems(suggestion, CompletionItemKind.Variable);
         }
         return null;
+    }
+
+    private searchDollar(line:string, position:Position):number{
+        for(let i = position.character; i >= 0; i--){
+            if(line.charAt(i) == "$"){
+                return i;
+            }
+        }
+        return 0;
     }
 }

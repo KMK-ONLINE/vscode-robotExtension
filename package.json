@@ -2,7 +2,7 @@
     "name": "robotf-extension",
     "displayName": "RobotF Extension",
     "description": "Extension for robot framework",
-    "version": "1.3.3",
+    "version": "1.4.1",
     "publisher": "kmk-labs",
     "engines": {
         "vscode": "^1.11.0"

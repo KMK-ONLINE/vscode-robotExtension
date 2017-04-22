@@ -97,3 +97,6 @@ Added rename provider
 
 ### 1.3.1
 Added hover provider
+
+### 1.4.0
+Major code restructure

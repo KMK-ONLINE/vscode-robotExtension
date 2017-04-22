@@ -20,7 +20,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Added rename provider for keyword
 
 ## [1.2.6] 17-apr-17
-### Bug Fix
+### Fixed
 - Fixed double dollar sign in variable autocomplete
 - Fixed double keyword in keyword autocomplete
 - Fixed resource path in resource autocomplete
@@ -29,7 +29,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Added some new builtin keyword
 
 ## [1.2.6] 19-apr-17
-### Bug Fix
+### Fixed
 - Fixed duplicated autocomplete
 ### Added
 - Added Global and Suite Variable definition
@@ -42,5 +42,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [1.3.2] 19-apr-17
 ### Added
 - Added rename provider for variable
+### Fixed
+- Various Bug Fix
+
+## [1.4.0] 22-apr-17
+### Changed
+- Create classes for Keyword, Variable, and RobotDoc
+- Restructure the logic flow
+- Remove unused function
 ### Bug Fix
+- Various Bug Fix
+
+## [1.4.1] 22-apr-17
+### Fixed
 - Various Bug Fix

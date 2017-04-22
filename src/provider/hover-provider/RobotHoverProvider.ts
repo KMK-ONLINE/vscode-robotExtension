@@ -14,24 +14,29 @@ export class RobotHoverProvider implements HoverProvider {
                 let args = keyword.args;
                 let ret = keyword.returnValue;
                 let definition = "[ ARGS: ";
-                if (args.length > 0) {
-                    for (let i = 0; i < args.length; i++) {
-                        if (i == args.length - 1) {
-                            definition += args[i];
-                        }
-                        else {
-                            definition += args[i] + ", ";
+                if (args.length == 0 && ret == "") {
+                    definition = "Need no arguments and give no return value";
+                }
+                else {
+                    if (args.length > 0) {
+                        for (let i = 0; i < args.length; i++) {
+                            if (i == args.length - 1) {
+                                definition += args[i];
+                            }
+                            else {
+                                definition += args[i] + ", ";
+                            }
                         }
                     }
-                }
-                else {
-                    definition += "-"
-                }
-                if (ret == "") {
-                    definition += " ] [ RET: - ]";
-                }
-                else {
-                    definition += " ] [ RET: " + ret + " ]";
+                    else {
+                        definition += "-"
+                    }
+                    if (ret == "") {
+                        definition += " ] [ RET: - ]";
+                    }
+                    else {
+                        definition += " ] [ RET: " + ret + " ]";
+                    }
                 }
                 return new Hover(definition, keyword.location.range);
             }
