@@ -1,3 +1,5 @@
+'use strict'
+
 import { CompletionItem, CompletionItemKind } from 'vscode';
 
 export function extractFileName(path: string): string {

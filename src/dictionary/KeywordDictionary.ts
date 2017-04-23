@@ -1,3 +1,5 @@
+'use strict'
+
 export var SYNTAX: string[] = [
 	"Documentation", "Library", "Resouce", "sizzle=", "css=", "dom=", "return", "id=", "identifier=", "name=", "xpath=", "link=", "partial link=",
 	"jquery=", "tag=", "default=", "text=", "timeout=", "message=", "loglevel=", "persist=", "hidden=", "True", "False", "Test Setup", "Test Teardown",
