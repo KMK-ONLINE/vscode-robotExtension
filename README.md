@@ -74,7 +74,7 @@ Performance issues when handle more than 300++ files in workspace
 
 ## For Contributors
 
-You can added new suggestion library with its keywords at src/helper/KeywordDictionary.ts with format:
+You can added new suggestion library with its keywords at src/dictionary/KeywordDictionary.ts with format:
 ``` typescript
 export var LIB =
 	[
