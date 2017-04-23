@@ -28,7 +28,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Added
 - Added some new builtin keyword
 
-## [1.2.6] 19-apr-17
+## [1.2.7] 19-apr-17
 ### Fixed
 - Fixed duplicated autocomplete
 ### Added
