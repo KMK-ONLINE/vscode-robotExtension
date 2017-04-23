@@ -126,7 +126,7 @@ export class RobotDoc {
             let resource = resources[i];
             let keywords = resource.keywords;
             for (let j = 0; j < keywords.length; j++) {
-                let name = keywords[i].name;
+                let name = keywords[j].name;
                 keyNames.push(name);
             }
         }
@@ -177,7 +177,7 @@ export class RobotDoc {
                 if (match) {
                     for (let j = 0; j < LIB.length; j++) {
                         if (!added[j]) {
-                            if (LIB[j].name == match[i]) {
+                            if (LIB[j].name == match[1]) {
                                 libs = libs.concat(LIB[j].key);
                                 addedLength--;
                             }

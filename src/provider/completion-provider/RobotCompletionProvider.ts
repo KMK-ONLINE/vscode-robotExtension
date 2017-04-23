@@ -23,11 +23,64 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 			return this.completeResource(document);
 		}
 		else if (keyword != null) {
-			return this.matchKeyword(document);
+			let key: string;
+			if (keyword.length == 2) {
+				key = keyword[1];
+			}
+			else {
+				key = keyword[0];
+			}
+			let words = key.split(/\s/);
+			if (words.length == 1 && keyword.length == 1) {
+				return this.matchKeyword(document);
+			}
+			else if (words.length == 1 && keyword.length == 2) {
+				this.matchFileLastSentence(keyword[0], words[0], document);
+			}
+			else {
+				let firstSentences: string = "";
+				let length = words.length - 1;
+				for (let i = 0; i < length; i++) {
+					firstSentences += words[i] + " ";
+				}
+				if (keyword.length == 2) {
+					return this.matchFileLastSentence(keyword[0], firstSentences, document);
+				}
+				else {
+					return this.matchLastSentence(firstSentences, document);
+				}
+			}
 		}
 		else {
 			return stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
 		}
+	}
+
+	private matchLastSentence(firstSentences: string, document: TextDocument): CompletionItem[] {
+		let thisDoc = RobotDoc.parseDocument(document);
+		let local = stringArrayToCompletionItems(
+			this.firstMatcher(firstSentences, thisDoc.keywordsName), CompletionItemKind.Function
+		);
+		let key = stringArrayToCompletionItems(
+			this.firstMatcher(firstSentences, thisDoc.allAvailableKeywordsName), CompletionItemKind.Function
+		);
+		let libKey = stringArrayToCompletionItems(
+			this.firstMatcher(firstSentences, thisDoc.library), CompletionItemKind.Function
+		);
+		let syntax = stringArrayToCompletionItems(
+			this.firstMatcher(firstSentences, SYNTAX), CompletionItemKind.Keyword
+		);
+		return local.concat(key, libKey, syntax);
+
+	}
+
+	private matchFileLastSentence(fileName: string, firstSentences: string, document: TextDocument): CompletionItem[] {
+		let doc = RobotDoc.parseDocument(document);
+		let keywords = doc.getKeywordsNameByResourceName(fileName);
+		let completionItem = stringArrayToCompletionItems(
+			this.firstMatcher(firstSentences, keywords), CompletionItemKind.Function
+		);
+		return completionItem;
 	}
 
 	private matchKeyword(document: TextDocument): CompletionItem[] {
@@ -42,7 +95,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private getLibAndSyntax(doc: RobotDoc): CompletionItem[] {
-		let libKey = stringArrayToCompletionItems(doc.library, CompletionItemKind.Function)
+		let libKey = stringArrayToCompletionItems(doc.library, CompletionItemKind.Function);
 		let syntax = stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
 		return libKey.concat(syntax);;
 	}
@@ -60,6 +113,17 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 		return [
 			new CompletionItem("Resource", CompletionItemKind.Keyword)
 		].concat(completionItem);;
+	}
+
+	private firstMatcher(firstSentences: string, keys: string[]): string[] {
+		let result: string[] = [];
+		for (let i = 0; i < keys.length; i++) {
+			let found = keys[i].indexOf(firstSentences)
+			if (found == 0) {
+				result.push(keys[i].substr(firstSentences.length));
+			}
+		}
+		return result;
 	}
 
 }
