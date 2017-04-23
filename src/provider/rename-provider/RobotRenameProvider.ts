@@ -1,5 +1,6 @@
 'use strict'
 
+import { Member } from '../../model/Member';
 import { RobotDoc } from '../../model/RobotDoc';
 import { replacer } from '../../helper/Editor'
 import { TextDocument, Position, RenameProvider, WorkspaceEdit, ProviderResult, CancellationToken } from 'vscode';
@@ -12,14 +13,14 @@ export class RobotRenameProvider implements RenameProvider {
             let thisDoc = RobotDoc.parseDocument(document);
             let variable = thisDoc.getVariableByPosition(position);
             let keyword = thisDoc.getKeywordByPosition(position);
-            let reff = []
+            let ref:Member[] = []
             if (keyword != null) {
-                reff = keyword.allRefference;
+                ref = keyword.allReference;
             }
             else if (variable != null) {
-                reff = variable.allRefference;
+                ref = variable.allReference;
             }
-            return replacer(reff, newName);
+            return replacer(ref, newName);
         });
     }
 }

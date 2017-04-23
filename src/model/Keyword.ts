@@ -30,7 +30,7 @@ export class Keyword extends Member {
         return this._return;
     }
 
-    get allRefference(): Member[] {
+    get allReference(): Member[] {
         let result: Member[] = [this];
         let doc = WorkspaceContext.getDocumentByUri(this.location.uri);
         let thisDoc = RobotDoc.parseDocument(doc);

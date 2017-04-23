@@ -5,6 +5,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Released]
 
+## [1.5.0] 24-apr-17
+### Added
+- Added reference provider
+
 ## [1.4.2] 23-apr-17
 ### Fixed
 - Fixed autocomplete when there's already a piece of keyword sentences

@@ -70,7 +70,7 @@ export class Variable extends Member {
         return null;
     }
 
-    get allRefference(): Variable[] {
+    get allReference(): Variable[] {
         if (this.isGlobal) {
             let result: Variable[] = [this];
             let origin = this.origin;

@@ -1,6 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { RobotReferenceProvider } from './provider/reference-provider/RobotReferenceProvider';
 import { RobotCompletionProvider } from './provider/completion-provider/RobotCompletionProvider';
 import { RobotDotCompletionProvider } from './provider/completion-provider/RobotDotCompletionProvider';
 import { RobotVariableCompletionProvider } from './provider/completion-provider/RobotVariableCompletionProvider';
@@ -44,15 +45,20 @@ export function activate(context: vscode.ExtensionContext) {
 		)
 	);
 	context.subscriptions.push(
+		vscode.languages.registerHoverProvider(
+			'robot', new RobotHoverProvider()
+		)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerReferenceProvider(
+			'robot', new RobotReferenceProvider()
+		)
+	);
+	context.subscriptions.push(
 		vscode.window.onDidChangeVisibleTextEditors(WorkspaceContext.scanWorkspace)
 	);
 	context.subscriptions.push(
 		vscode.window.onDidChangeActiveTextEditor(WorkspaceContext.scanWorkspace)
-	);
-	context.subscriptions.push(
-		vscode.languages.registerHoverProvider(
-			'robot', new RobotHoverProvider()
-		)
 	);
 }
 
