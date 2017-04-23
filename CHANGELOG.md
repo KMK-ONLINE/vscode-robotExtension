@@ -56,3 +56,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [1.4.1] 22-apr-17
 ### Fixed
 - Various Bug Fix
+
+## [1.4.2] 23-apr-17
+### Fixed
+- Fixed autocomplete when there's already a piece of keyword sentences
