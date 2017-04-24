@@ -70,7 +70,7 @@ export class WorkspaceContext {
     }
 
     /**
-     * Procedure to scan workspace and searh all its robot document and put it in this context
+     * Procedure to scan workspace and search all its robot document and put it in this context
      */
     public static scanWorkspace() {
         if (WorkspaceContext.asyncReadingCounter == 0) {
