@@ -12,7 +12,7 @@ export class RobotDotCompletionProvider implements CompletionItemProvider {
 		let keyword = getDocKeyByPos(document, position);
 		if (keyword != null) {
 			if (keyword.length == 2) {
-				return this.matchJustKeyword(document, keyword[0]);
+				return RobotDotCompletionProvider.matchJustKeyword(document, keyword[0]);
 			}
 		}
 		else {
@@ -23,7 +23,7 @@ export class RobotDotCompletionProvider implements CompletionItemProvider {
 		}
 	}
 
-	private matchJustKeyword(document: TextDocument, fileName: string): CompletionItem[] {
+	private static matchJustKeyword(document: TextDocument, fileName: string): CompletionItem[] {
 		let doc = RobotDoc.parseDocument(document);
 		let keywords = doc.getKeywordsNameByResourceName(fileName);
 		let completionItem = stringArrayToCompletionItems(keywords, CompletionItemKind.Function);

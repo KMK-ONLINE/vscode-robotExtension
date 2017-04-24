@@ -3,6 +3,14 @@
 import { Location, TextDocument, Range, Position } from 'vscode';
 import { Keyword } from '../model/Keyword';
 
+/**
+ * Function to get keyword by its position
+ * 
+ * @param document TextDocument object which the keyword will be searched
+ * @param position Position Object of the keyword
+ * 
+ * @return Array of string, if the keyword have specific locator, then it will return 2 string contains its file origin and its keyword
+ */
 export function getDocKeyByPos(document: TextDocument, position: Position): string[] {
     let line = document.lineAt(position.line).text;
     let whiteSpace: number = 0;
@@ -30,6 +38,13 @@ export function getDocKeyByPos(document: TextDocument, position: Position): stri
     }
 }
 
+/**
+ * Function to search keywords from TextDocument
+ * 
+ * @param file TextDocument object
+ * 
+ * @return Array of Keyword found
+ */
 export function searchKeywords(file: TextDocument): Keyword[] {
     let keywords: Keyword[] = [];
     let isInKeywordRange = false;

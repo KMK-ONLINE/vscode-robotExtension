@@ -4,6 +4,13 @@ import { TextDocument } from 'vscode';
 import { removeSamePath } from '../Util';
 import { WorkspaceContext } from '../WorkspaceContext';
 
+/**
+ * Function to search included resources from TextDocument
+ * 
+ * @param document TextDocument object
+ * 
+ * @return Array of TextDocument, it will return empty array if resources are not found
+ */
 export function searchResources(document: TextDocument): TextDocument[] {
     let fileLength = document.lineCount;
     let resources: TextDocument[] = [];
@@ -20,6 +27,14 @@ export function searchResources(document: TextDocument): TextDocument[] {
     return resources;
 }
 
+/**
+ * Function to search TextDocument object by its relative path from one TextDocument
+ * 
+ * @param thisDocument TextDocument which will be start of the relative path 
+ * @param filePath the relative path
+ * 
+ * @return TextDocument object
+ */
 export function searchOriginDocumentByRelativePath(thisDocument: TextDocument, filePath: string)
     : TextDocument {
     return WorkspaceContext.getDocumentByPath(
@@ -27,6 +42,14 @@ export function searchOriginDocumentByRelativePath(thisDocument: TextDocument, f
     );
 }
 
+/**
+ * Function to search absolute path from relative path from one TextDocument
+ * 
+ * @param thisDocument TextDocument which will be start of the relative path 
+ * @param filePath the relative path
+ * 
+ * @return absolute path of the relative path 
+ */
 export function searchOriginByRelativePath(thisDocument: TextDocument, filePath: string): string {
     let thisFolderPath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.?\w*$/, "");
     while (/^\.\.\.?\//.test(filePath)) {
@@ -36,6 +59,15 @@ export function searchOriginByRelativePath(thisDocument: TextDocument, filePath:
     return thisFolderPath + filePath;
 }
 
+/**
+ * Function to format the resource absolute path into its relative path with first sentences
+ * 
+ * @param thisDocument TextDocument Object which will include the resource
+ * @param start start sentences before the relative path
+ * @param path the absolute path of the resource
+ * 
+ * @return string o formated resource path
+ */
 export function formatResource(thisDocument: TextDocument, start: string, path: string)
     : string {
     let filePath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "").replace(/\\/g, "/");
@@ -49,6 +81,15 @@ export function formatResource(thisDocument: TextDocument, start: string, path: 
     return (start + temp[1]);
 }
 
+/**
+ * Function to format the resources absolute paths into its relative path with first sentences
+ * 
+ * @param thisDocument TextDocument Object which will include the resource
+ * @param start start sentences before the relative path
+ * @param path the absolute paths of the resources
+ * 
+ * @return string of formated resources path
+ */
 export function formatResources(thisDocument: TextDocument, start: string, path: string[])
     : string[] {
     let resourcesFormat: string[] = [];
@@ -58,6 +99,14 @@ export function formatResources(thisDocument: TextDocument, start: string, path:
     return resourcesFormat;
 }
 
+/**
+ * Function to format resources absolute paths into relative path with standard robotframework format
+ * 
+ * @param thisDocument TextDocument Object which will include the resource
+ * @param path the abosolute paths of the resources
+ * 
+ * @return string of formated resources path
+ */
 export function formatFullResources(thisDocument: TextDocument, path: string[]): string[] {
     let resourcesFormat: string[] = [];
     resourcesFormat = resourcesFormat.concat(

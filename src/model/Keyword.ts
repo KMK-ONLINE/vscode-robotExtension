@@ -6,31 +6,55 @@ import { Location, Position, Range } from 'vscode';
 import { WorkspaceContext } from '../WorkspaceContext';
 import { RobotDoc } from './RobotDoc';
 
+/**
+ * robot keyword class, its intent is to hold Keyword definition from robot document
+ */
 export class Keyword extends Member {
+
     private _arguments: string[] = [];
     private _return: string = "";
 
+    /**
+     * Keyword default constructor
+     * 
+     * @param name keyword name
+     * @param location keyword location
+     * @param args keyword arguments
+     * @param returnValue keyword return value
+     */
     public constructor(name: string, location: Location, args: string[], returnValue: string) {
         super(name, location);
         this._arguments = args;
         this._return = returnValue;
     }
 
+    /**
+     * keyword's fullname include its file origin
+     */
     get fullName(): string {
         let path = this.location.uri.fsPath;
         let resource = extractNameFromPath(path);
         return resource + "." + this.name;
     }
 
+    /**
+     * keyword's arguments
+     */
     get args(): string[] {
         return this._arguments;
     }
 
+    /**
+     * keyword's return value
+     */
     get returnValue(): string {
         return this._return;
     }
 
-    get allReference(): Member[] {
+    /**
+     * all keyword's references in Array of Member
+     */
+    get allReferences(): Member[] {
         let result: Member[] = [this];
         let doc = WorkspaceContext.getDocumentByUri(this.location.uri);
         let thisDoc = RobotDoc.parseDocument(doc);

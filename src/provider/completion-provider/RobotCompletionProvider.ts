@@ -17,10 +17,10 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 		let resourceMatcher1 = line.text.match(/^([rR][eE]?[sS]?[oO]?[uU]?[rR]?[cC]?[eE]?)$/);
 		let resourceMatcher2 = line.text.match(/^Resource\s{2,}(([-_]+|\w+)+)\s*$/);
 		if (resourceMatcher1) {
-			return this.matchResource(document);
+			return RobotCompletionProvider.matchResource(document);
 		}
 		else if (resourceMatcher2) {
-			return this.completeResource(document);
+			return RobotCompletionProvider.completeResource(document);
 		}
 		else if (keyword != null) {
 			let key: string;
@@ -32,10 +32,10 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 			}
 			let words = key.split(/\s/);
 			if (words.length == 1 && keyword.length == 1) {
-				return this.matchKeyword(document);
+				return RobotCompletionProvider.matchKeyword(document);
 			}
 			else if (words.length == 1 && keyword.length == 2) {
-				this.matchFileLastSentence(keyword[0], words[0], document);
+				RobotCompletionProvider.matchFileLastSentence(keyword[0], words[0], document);
 			}
 			else {
 				let firstSentences: string = "";
@@ -44,10 +44,10 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 					firstSentences += words[i] + " ";
 				}
 				if (keyword.length == 2) {
-					return this.matchFileLastSentence(keyword[0], firstSentences, document);
+					return RobotCompletionProvider.matchFileLastSentence(keyword[0], firstSentences, document);
 				}
 				else {
-					return this.matchLastSentence(firstSentences, document);
+					return RobotCompletionProvider.matchLastSentence(firstSentences, document);
 				}
 			}
 		}
@@ -56,57 +56,57 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 		}
 	}
 
-	private matchLastSentence(firstSentences: string, document: TextDocument): CompletionItem[] {
+	private static matchLastSentence(firstSentences: string, document: TextDocument): CompletionItem[] {
 		let thisDoc = RobotDoc.parseDocument(document);
 		let local = stringArrayToCompletionItems(
-			this.firstMatcher(firstSentences, thisDoc.keywordsName), CompletionItemKind.Function
+			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.keywordsName), CompletionItemKind.Function
 		);
 		let key = stringArrayToCompletionItems(
-			this.firstMatcher(firstSentences, thisDoc.allAvailableKeywordsName), CompletionItemKind.Function
+			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.allExistKeywordsName), CompletionItemKind.Function
 		);
 		let libKey = stringArrayToCompletionItems(
-			this.firstMatcher(firstSentences, thisDoc.library), CompletionItemKind.Function
+			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.library), CompletionItemKind.Function
 		);
 		let syntax = stringArrayToCompletionItems(
-			this.firstMatcher(firstSentences, SYNTAX), CompletionItemKind.Keyword
+			RobotCompletionProvider.firstMatcher(firstSentences, SYNTAX), CompletionItemKind.Keyword
 		);
 		return local.concat(key, libKey, syntax);
 
 	}
 
-	private matchFileLastSentence(fileName: string, firstSentences: string, document: TextDocument): CompletionItem[] {
+	private static matchFileLastSentence(fileName: string, firstSentences: string, document: TextDocument): CompletionItem[] {
 		let doc = RobotDoc.parseDocument(document);
 		let keywords = doc.getKeywordsNameByResourceName(fileName);
 		let completionItem = stringArrayToCompletionItems(
-			this.firstMatcher(firstSentences, keywords), CompletionItemKind.Function
+			RobotCompletionProvider.firstMatcher(firstSentences, keywords), CompletionItemKind.Function
 		);
 		return completionItem;
 	}
 
-	private matchKeyword(document: TextDocument): CompletionItem[] {
+	private static matchKeyword(document: TextDocument): CompletionItem[] {
 		let thisDoc = RobotDoc.parseDocument(document);
 		let included = stringArrayToCompletionItems(thisDoc.allResourcesName, CompletionItemKind.Class);
 		let localKeyComplete = stringArrayToCompletionItems(thisDoc.keywordsName, CompletionItemKind.Function);
 		let keyComplete = stringArrayToCompletionItems(
-			thisDoc.allAvailableKeywordsFullName, CompletionItemKind.Function
+			thisDoc.allExistKeywordsFullName, CompletionItemKind.Function
 		);
-		let otherKey = this.getLibAndSyntax(thisDoc);
+		let otherKey = RobotCompletionProvider.getLibAndSyntax(thisDoc);
 		return included.concat(otherKey, localKeyComplete, keyComplete);
 	}
 
-	private getLibAndSyntax(doc: RobotDoc): CompletionItem[] {
+	private static getLibAndSyntax(doc: RobotDoc): CompletionItem[] {
 		let libKey = stringArrayToCompletionItems(doc.library, CompletionItemKind.Function);
 		let syntax = stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
 		return libKey.concat(syntax);;
 	}
 
-	private completeResource(document: TextDocument): CompletionItem[] {
+	private static completeResource(document: TextDocument): CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
 		let resourceRelativePath = formatResources(document, "", resources);
 		return stringArrayToCompletionItems(resourceRelativePath, CompletionItemKind.File);
 	}
 
-	private matchResource(document: TextDocument): CompletionItem[] {
+	private static matchResource(document: TextDocument): CompletionItem[] {
 		let resources = WorkspaceContext.getAllPath();
 		let includesFormat = formatFullResources(document, resources);
 		let completionItem = stringArrayToCompletionItems(includesFormat, CompletionItemKind.File);
@@ -115,7 +115,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 		].concat(completionItem);;
 	}
 
-	private firstMatcher(firstSentences: string, keys: string[]): string[] {
+	private static firstMatcher(firstSentences: string, keys: string[]): string[] {
 		let result: string[] = [];
 		for (let i = 0; i < keys.length; i++) {
 			let found = keys[i].indexOf(firstSentences)

@@ -9,6 +9,9 @@ import { WorkspaceContext } from '../WorkspaceContext';
 import { searchResources } from '../helper/ResourceHelper';
 import { LIB } from '../dictionary/KeywordDictionary'
 
+/**
+ * RobotDoc class which contains document's keywords, variables and its resources
+ */
 export class RobotDoc {
 
     private _keywords: Keyword[];
@@ -25,6 +28,11 @@ export class RobotDoc {
         this._resources = resources;
     }
 
+    /**
+     * Function to parsing TextDocument object into RobotDoc Object
+     * 
+     * @param document 
+     */
     public static parseDocument(document: TextDocument): RobotDoc {
         let variables = searchVariables(document);
         let keywords = searchKeywords(document);
@@ -34,16 +42,25 @@ export class RobotDoc {
         return result;
     }
 
+    /**
+     * name of the document
+     */
     get name() {
         let path = this.document.fileName;
         let nameWithExtension = path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
         return nameWithExtension.replace(/\.\w+$/, "");
     }
 
+    /**
+     * document's variables
+     */
     get variables() {
         return this._variables;
     }
 
+    /**
+     * document's variables definition
+     */
     get variableDefinitions() {
         let defines: Variable[] = [];
         let variables = this.variables;
@@ -55,6 +72,9 @@ export class RobotDoc {
         return defines;
     }
 
+    /**
+     * document's used variables
+     */
     get usedVariables() {
         let used: Variable[] = [];
         let variables = this.variables;
@@ -66,7 +86,10 @@ export class RobotDoc {
         return used;
     }
 
-    get availableVariablesName(): string[] {
+    /**
+     * all variable names in the document
+     */
+    get allVariablesName(): string[] {
         let docVarNames: Set<string> = new Set();
         let variables = this.variables;
         for (let i = 0; i < variables.length; i++) {
@@ -75,8 +98,11 @@ export class RobotDoc {
         return Array.from(docVarNames);
     }
 
-    get allAvailableVariablesName(): string[] {
-        let varNames: Set<string> = new Set(this.availableVariablesName);
+    /**
+     * all variable names in the document and its resources
+     */
+    get allIncludedVariablesName(): string[] {
+        let varNames: Set<string> = new Set(this.allVariablesName);
         let resources = this.allResources;
         for (let i = 0; i < resources.length; i++) {
             let resource = resources[i];
@@ -89,10 +115,16 @@ export class RobotDoc {
         return Array.from(varNames);
     }
 
+    /**
+     * document keywords
+     */
     get keywords() {
         return this._keywords;
     }
 
+    /**
+     * document keywords name
+     */
     get keywordsName() {
         let keywords = this.keywords;
         let result: string[] = [];
@@ -102,7 +134,10 @@ export class RobotDoc {
         return result;
     }
 
-    get allAvailableKeywordsFullName(): string[] {
+    /**
+     * document and its resources keywords full name with its resource origin
+     */
+    get allExistKeywordsFullName(): string[] {
         let keyNames: string[] = [];
         let resources = this.allResources;
         for (let i = 0; i < resources.length; i++) {
@@ -119,7 +154,10 @@ export class RobotDoc {
         return keyNames;
     }
 
-    get allAvailableKeywordsName(): string[] {
+    /**
+     * document and its resources keywords name
+     */
+    get allExistKeywordsName(): string[] {
         let keyNames: string[] = [];
         let resources = this.allResources;
         for (let i = 0; i < resources.length; i++) {
@@ -133,10 +171,16 @@ export class RobotDoc {
         return keyNames;
     }
 
+    /**
+     * document TextDocument object
+     */
     get document() {
         return this._doc;
     }
 
+    /**
+     * document resources
+     */
     get resources() {
         let res: RobotDoc[] = [];
         for (let i = 0; i < this._resources.length; i++) {
@@ -146,16 +190,25 @@ export class RobotDoc {
         return res;
     }
 
+    /**
+     * document resources in TextDocument object form
+     */
     get rawResources() {
         return this._resources;
     }
 
+    /**
+     * all of document's resources included its direct include
+     */
     get allResources() {
         let container: RobotDoc[] = [this];
         container = this.scanResources(container);
         return container;
     }
 
+    /**
+     * all of document's resources name included its direct include
+     */
     get allResourcesName() {
         let resources = this.allResources;
         let result: string[] = [];
@@ -165,6 +218,9 @@ export class RobotDoc {
         return result;
     }
 
+    /**
+     * all of document's library included its direct include
+     */
     get library(): string[] {
         let libs: string[] = [];
         let resources = this.allResources;
@@ -190,6 +246,13 @@ export class RobotDoc {
         return libs;
     }
 
+    /**
+     * Method to get Variable object exist in the document using its position
+     * 
+     * @param position position of the variable
+     * 
+     * @return Variable object found, it will retrun null if variable is not found
+     */
     public getVariableByPosition(position: Position): Variable {
         for (let i = 0; i < this._variables.length; i++) {
             let variable = this._variables[i];
@@ -200,6 +263,13 @@ export class RobotDoc {
         return null;
     }
 
+    /**
+     * Method to get Keyword object exist in the document using its position
+     * 
+     * @param position position of the keyword
+     * 
+     * @return Keyword object found, it will retrun null if keyword is not found
+     */
     public getKeywordByPosition(position: Position): Keyword {
         let keyword: string;
         let files: RobotDoc[];
@@ -234,7 +304,14 @@ export class RobotDoc {
         }
     }
 
-    public getKeywordsByName(fileName: string) {
+    /**
+     * Method to get Keyword which available in the document's resource by its resource name
+     * 
+     * @param fileName name of the resource
+     * 
+     * @return Array of Keyword found. It will return empty array if resource or keyword is not found
+     */
+    public getKeywordsByName(fileName: string): Keyword[] {
         let resources = this.resources;
         for (let i = 0; i < resources.length; i++) {
             if (resources[i].name == fileName) {
@@ -244,6 +321,13 @@ export class RobotDoc {
         return [];
     }
 
+    /**
+     * Method to get keyword's name which available in the document's resource by its resource name
+     * 
+     * @param fileName name of the resource
+     * 
+     * @return Array of keywords name found. it will return empty array if resource or keyword is not found
+     */
     public getKeywordsNameByResourceName(fileName: string) {
         let resources = this.allResources;
         for (let i = 0; i < resources.length; i++) {
@@ -254,6 +338,13 @@ export class RobotDoc {
         return [];
     }
 
+    /**
+     * Method to search all Variable object exist in the document by its name
+     * 
+     * @param name variable name
+     * 
+     * @return array of Varaible. It will return empy array if variable is not found
+     */
     public searchVariables(name: string): Variable[] {
         let result = [];
         let variables = this.variables;
@@ -265,8 +356,15 @@ export class RobotDoc {
         return result;
     }
 
+    /**
+     * Method to check is variable exist in the document by its name
+     * 
+     * @param name name of the variable
+     * 
+     * @return boolean
+     */
     public isVariableExist(name: string): boolean {
-        let docVarNames = this.availableVariablesName;
+        let docVarNames = this.allVariablesName;
         for (let i = 0; i < docVarNames.length; i++) {
             if (docVarNames[i] == name) {
                 return true;
@@ -275,6 +373,13 @@ export class RobotDoc {
         return false;
     }
 
+    /**
+     * Metod to check equality of the RobotDoc object
+     * 
+     * @param doc RobotDoc object
+     * 
+     * @return boolean
+     */
     public isEqual(doc: RobotDoc): boolean {
         return this._doc.uri.fsPath == doc.document.uri.fsPath;
     }

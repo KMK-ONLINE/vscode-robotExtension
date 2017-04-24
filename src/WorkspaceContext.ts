@@ -3,6 +3,9 @@
 import { workspace, TextDocument, Uri } from 'vscode';
 import fs = require('fs');
 
+/**
+ * Context of workspace which will hold all of the workspace robot files
+ */
 export class WorkspaceContext {
 
     private static allDoc: TextDocument[] = [];
@@ -10,18 +13,34 @@ export class WorkspaceContext {
     private static asyncReadingCounter: number = 0;
     private static temp: TextDocument[];
 
+    /**
+     * Function to get number of robot document in the workspace
+     */
     public static size(): number {
         return WorkspaceContext.allDoc.length;
     }
 
+    /**
+     * Function to get all of the robot TextDocument object in the workspace
+     */
     public static getAllDocuments(): TextDocument[] {
         return WorkspaceContext.allDoc;
     }
 
+    /**
+     * Function to get all robot path in the workspace
+     */
     public static getAllPath(): string[] {
         return WorkspaceContext.allPath;
     }
 
+    /**
+     * Function to get workspace robot TextDocument object by its path
+     * 
+     * @param path string of path
+     * 
+     * @return TextDocument object, it will return null if not found
+     */
     public static getDocumentByPath(path: string): TextDocument {
         path = path.replace(/(\\|\/)/g, "/");
         for (let i = 0; i < WorkspaceContext.allDoc.length; i++) {
@@ -33,6 +52,13 @@ export class WorkspaceContext {
         return null;
     }
 
+    /**
+     * Function to get workspace robot TextDocument object by its uri
+     * 
+     * @param uri Uri object
+     * 
+     * @return TextDocument object, it will return null if not found
+     */
     public static getDocumentByUri(uri: Uri): TextDocument {
         for (let i = 0; i < WorkspaceContext.allDoc.length; i++) {
             let docPath = WorkspaceContext.allDoc[i].uri.fsPath;
@@ -43,6 +69,9 @@ export class WorkspaceContext {
         return null;
     }
 
+    /**
+     * Procedure to scan workspace and searh all its robot document and put it in this context
+     */
     public static scanWorkspace() {
         if (WorkspaceContext.asyncReadingCounter == 0) {
             WorkspaceContext.asyncReadingCounter = 1;
@@ -77,6 +106,13 @@ export class WorkspaceContext {
         }
     }
 
+    /**
+     * Function to get all directory and document path from the given paths
+     * 
+     * @param paths 
+     * 
+     * @return all path found, it will return empty array if the directory is empty
+     */
     public static getAllDirAndDocPath(paths: string[]): string[] {
         let allFiles: string[] = [];
         for (let i = 0; i < paths.length; i++) {

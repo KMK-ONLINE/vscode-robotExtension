@@ -4,24 +4,46 @@ import { Location, WorkspaceEdit, Position, Range } from 'vscode';
 import { WorkspaceContext } from '../WorkspaceContext';
 import { replace } from '../helper/Editor';
 
+/**
+ * Member class which represent all of robot document general components
+ */
 export class Member {
     private _name: string;
     private _location: Location;
 
+    /**
+     * Member default constructor
+     * 
+     * @param name member name
+     * @param location member location
+     */
     public constructor(name: string, location: Location) {
         this._name = name;
         this._location = location;
     }
 
+    /**
+     * member's name
+     */
     get name(): string {
         return this._name;
     }
 
+    /**
+     * member's location
+     */
     get location() {
         return this._location;
     }
 
-    public editName(name: string, editor: WorkspaceEdit): WorkspaceEdit {
+    /**
+     * Method to rename this member name
+     * @param name new name
+     * @param editor WorkspaceEdit object
+     * 
+     * @return WorkspaceEdit object
+     */
+    public rename(name: string, editor: WorkspaceEdit): WorkspaceEdit {
         replace(this.location, name, editor);
         let line = this.location.range.start.line;
         let start = this.location.range.start;
@@ -31,6 +53,13 @@ export class Member {
         return editor;
     }
 
+    /**
+     * Method to check equality of members object
+     * 
+     * @param member Member object
+     * 
+     * @return boolean
+     */
     public isEqual(member: Member): boolean {
         if (this._location.uri.fsPath == member.location.uri.fsPath) {
             if (this._location.range.start.line == member.location.range.start.line) {

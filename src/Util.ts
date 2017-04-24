@@ -2,14 +2,36 @@
 
 import { CompletionItem, CompletionItemKind } from 'vscode';
 
-export function extractFileName(path: string): string {
+/**
+ * Function to extract file name from the given path, extension of file included
+ * 
+ * @param path string of path
+ * 
+ * @return string of file name
+ */
+export function extractFileNameFromPath(path: string): string {
     return path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
 }
 
+/**
+ * Function to extract file name from the given path, extension of file not included
+ * 
+ * @param path string of path
+ * 
+ * @return string of file name
+ */
 export function extractNameFromPath(path: string): string {
-    return extractFileName(path).replace(/\.\w+$/, "");
+    return extractFileNameFromPath(path).replace(/\.\w+$/, "");
 }
 
+/**
+ * Function to search same path from two path and remove it
+ * 
+ * @param a first path
+ * @param b second path
+ * 
+ * @return array of a and b which its same path removed
+ */
 export function removeSamePath(a: string, b: string): string[] {
     let size = 0;
     for (let i = 0; i < b.length; i++) {
@@ -27,6 +49,14 @@ export function removeSamePath(a: string, b: string): string[] {
     return result;
 }
 
+/**
+ * Function to format array of string to completion item
+ * 
+ * @param suggestions array of string
+ * @param type CompletionItemKind object
+ * 
+ * @return array of CompletionItem object
+ */
 export function stringArrayToCompletionItems(suggestions: string[], type: CompletionItemKind)
     : CompletionItem[] {
     let items: CompletionItem[] = [];
@@ -37,7 +67,15 @@ export function stringArrayToCompletionItems(suggestions: string[], type: Comple
     return items;
 }
 
-export function subArrayOfString(list: string[], start: number) {
+/**
+ * Function to substr array of string at once
+ * 
+ * @param list array of string
+ * @param start start index of substr
+ * 
+ * @return array of substr string
+ */
+export function subArrayOfString(list: string[], start: number): string[] {
     let result: string[] = [];
     for (let i = 0; i < list.length; i++) {
         let str = list[i].substr(start);

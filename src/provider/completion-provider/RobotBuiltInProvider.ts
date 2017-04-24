@@ -5,19 +5,19 @@ import { subArrayOfString, stringArrayToCompletionItems } from '../../Util';
 
 export class RobotBuiltInProvider implements CompletionItemProvider {
 
-    private dictionary: string[] = [
+    private static dictionary: string[] = [
         "*** Variable ***\n",
         "*** Settings ***\n",
         "*** Test Case ***\n",
         "*** Keywords ***\n",
     ];
 
-    private fieldDictionary: string[] = [
+    private static fieldDictionary: string[] = [
         "Arguments",
         "Return"
     ];
 
-    private controlDictionary: string[] = [
+    private static controlDictionary: string[] = [
         "FOR        ${INDEX}        IN RANGE        ",
         "FOR       ${ELEMENT}        IN        @{",
     ]
@@ -27,14 +27,14 @@ export class RobotBuiltInProvider implements CompletionItemProvider {
         let char = document.lineAt(position).text.charAt(position.character - 1);
         if (char == "*") {
             let sub = position.character - document.lineAt(position).firstNonWhitespaceCharacterIndex;
-            let res = subArrayOfString(this.dictionary, sub);
+            let res = subArrayOfString(RobotBuiltInProvider.dictionary, sub);
             return stringArrayToCompletionItems(res, CompletionItemKind.Field);
         }
         else if (char == "[") {
-            return stringArrayToCompletionItems(this.fieldDictionary, CompletionItemKind.Field);
+            return stringArrayToCompletionItems(RobotBuiltInProvider.fieldDictionary, CompletionItemKind.Field);
         }
         else {
-            return stringArrayToCompletionItems(this.controlDictionary, CompletionItemKind.Snippet);
+            return stringArrayToCompletionItems(RobotBuiltInProvider.controlDictionary, CompletionItemKind.Snippet);
         }
     }
 }

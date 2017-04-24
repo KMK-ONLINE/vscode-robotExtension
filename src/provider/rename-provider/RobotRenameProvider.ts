@@ -15,10 +15,10 @@ export class RobotRenameProvider implements RenameProvider {
             let keyword = thisDoc.getKeywordByPosition(position);
             let ref:Member[] = []
             if (keyword != null) {
-                ref = keyword.allReference;
+                ref = keyword.allReferences;
             }
             else if (variable != null) {
-                ref = variable.allReference;
+                ref = variable.allReferences;
             }
             return replacer(ref, newName);
         });

@@ -14,16 +14,16 @@ export class RobotReferenceProvider implements ReferenceProvider {
             let keyword = thisDoc.getKeywordByPosition(position);
             let ref:Member[] = []
             if (keyword != null) {
-                ref = keyword.allReference;
+                ref = keyword.allReferences;
             }
             else if (variable != null) {
-                ref = variable.allReference;
+                ref = variable.allReferences;
             }
-            return this.membersToArrOfLocation(ref);
+            return RobotReferenceProvider.membersToArrOfLocation(ref);
             });
     }
 
-    private membersToArrOfLocation(members:Member[]):Location[]{
+    private static membersToArrOfLocation(members:Member[]):Location[]{
         let result:Location[] = [];
         for(let i = 0; i < members.length; i++){
             result.push(members[i].location);
