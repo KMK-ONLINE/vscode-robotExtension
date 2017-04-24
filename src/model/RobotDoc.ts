@@ -116,14 +116,14 @@ export class RobotDoc {
     }
 
     /**
-     * document keywords
+     * document's keywords
      */
     get keywords() {
         return this._keywords;
     }
 
     /**
-     * document keywords name
+     * document's keywords name
      */
     get keywordsName() {
         let keywords = this.keywords;
@@ -135,7 +135,7 @@ export class RobotDoc {
     }
 
     /**
-     * document and its resources keywords full name with its resource origin
+     * document's and its resources's keywords full name with its resource origin
      */
     get allExistKeywordsFullName(): string[] {
         let keyNames: string[] = [];
@@ -155,7 +155,7 @@ export class RobotDoc {
     }
 
     /**
-     * document and its resources keywords name
+     * document's and its resources's keywords name
      */
     get allExistKeywordsName(): string[] {
         let keyNames: string[] = [];
@@ -172,14 +172,14 @@ export class RobotDoc {
     }
 
     /**
-     * document TextDocument object
+     * document's TextDocument object
      */
     get document() {
         return this._doc;
     }
 
     /**
-     * document resources
+     * document's resources
      */
     get resources() {
         let res: RobotDoc[] = [];
@@ -191,7 +191,7 @@ export class RobotDoc {
     }
 
     /**
-     * document resources in TextDocument object form
+     * document's resources in TextDocument object form
      */
     get rawResources() {
         return this._resources;
