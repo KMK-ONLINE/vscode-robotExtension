@@ -1,5 +1,9 @@
 'use strict'
 
+var queue = require('bull');
+import { async } from 'async';
+import { isUndefined } from 'util';
+import { RobotDoc } from './model/RobotDoc';
 import { workspace, TextDocument, Uri } from 'vscode';
 import fs = require('fs');
 
@@ -8,23 +12,22 @@ import fs = require('fs');
  */
 export class WorkspaceContext {
 
-    private static allDoc: TextDocument[] = [];
+    private static allRobotDoc: RobotDoc[];
     private static allPath: string[] = [];
     private static asyncReadingCounter: number = 0;
-    private static temp: TextDocument[];
-
+    private static event: number = 0;
     /**
      * Function to get number of robot document in the workspace
      */
     public static size(): number {
-        return WorkspaceContext.allDoc.length;
+        return WorkspaceContext.allRobotDoc.length;
     }
 
     /**
      * Function to get all of the robot TextDocument object in the workspace
      */
-    public static getAllDocuments(): TextDocument[] {
-        return WorkspaceContext.allDoc;
+    public static getAllDocuments(): RobotDoc[] {
+        return WorkspaceContext.allRobotDoc;
     }
 
     /**
@@ -41,12 +44,12 @@ export class WorkspaceContext {
      * 
      * @return TextDocument object, it will return null if not found
      */
-    public static getDocumentByPath(path: string): TextDocument {
+    public static getDocumentByPath(path: string): RobotDoc {
         path = path.replace(/(\\|\/)/g, "/");
-        for (let i = 0; i < WorkspaceContext.allDoc.length; i++) {
-            let docPath = WorkspaceContext.allDoc[i].fileName.replace(/(\\|\/)/g, "/");
+        for (let i = 0; i < WorkspaceContext.allRobotDoc.length; i++) {
+            let docPath = WorkspaceContext.allRobotDoc[i].document.fileName.replace(/(\\|\/)/g, "/");
             if (docPath == path) {
-                return WorkspaceContext.allDoc[i];
+                return WorkspaceContext.allRobotDoc[i];
             }
         }
         return null;
@@ -59,11 +62,11 @@ export class WorkspaceContext {
      * 
      * @return TextDocument object, it will return null if not found
      */
-    public static getDocumentByUri(uri: Uri): TextDocument {
-        for (let i = 0; i < WorkspaceContext.allDoc.length; i++) {
-            let docPath = WorkspaceContext.allDoc[i].uri.fsPath;
+    public static getDocumentByUri(uri: Uri): RobotDoc {
+        for (let i = 0; i < WorkspaceContext.allRobotDoc.length; i++) {
+            let docPath = WorkspaceContext.allRobotDoc[i].document.uri.fsPath;
             if (docPath == uri.fsPath) {
-                return WorkspaceContext.allDoc[i];
+                return WorkspaceContext.allRobotDoc[i];
             }
         }
         return null;
@@ -77,17 +80,33 @@ export class WorkspaceContext {
             WorkspaceContext.asyncReadingCounter = 1;
             console.log("scanning all .robot and .txt path");
             WorkspaceContext.allPath = WorkspaceContext.getAllDirAndDocPath([workspace.rootPath]);
-            WorkspaceContext.temp = [];
+            let docTemp: TextDocument[] = [];
+            let temp: RobotDoc[] = [];
             WorkspaceContext.asyncReadingCounter += WorkspaceContext.allPath.length;
             for (let i = 0; i < WorkspaceContext.allPath.length; i++) {
-                let opener = workspace.openTextDocument(Uri.file(WorkspaceContext.allPath[i]));
-                opener.then((document) => {
-                    WorkspaceContext.temp.push(document);
+                let opener = workspace.openTextDocument(Uri.file(WorkspaceContext.allPath[i])).then((document) => {
+                    docTemp.push(document);
                     WorkspaceContext.asyncReadingCounter--;
                     if (WorkspaceContext.asyncReadingCounter == 1) {
-                        WorkspaceContext.allDoc = WorkspaceContext.temp;
+                        for (let j = 0; j < docTemp.length; j++) {
+                            let doc = docTemp[j];
+                            if (!(isUndefined(doc))) {
+                                temp.push(RobotDoc.parseDocument(doc));
+                            }
+                        }
+                        WorkspaceContext.allRobotDoc = temp;
+                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
+                            let doc = WorkspaceContext.allRobotDoc[j];
+                            doc.searchResources();
+                        }
+                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
+                            let doc = WorkspaceContext.allRobotDoc[j];
+                            doc.scanAllResources();
+                            doc.assignGlobalVariables();
+                            doc.scanAllString();
+                        }
                         console.log(
-                            "finished scanning " + WorkspaceContext.allDoc.length + " robot and txt document"
+                            "finished scanning " + WorkspaceContext.allRobotDoc.length + " robot and txt document"
                         );
                         WorkspaceContext.asyncReadingCounter = 0;
                     }
@@ -95,9 +114,25 @@ export class WorkspaceContext {
                     console.log(reason);
                     WorkspaceContext.asyncReadingCounter--;
                     if (WorkspaceContext.asyncReadingCounter == 1) {
-                        WorkspaceContext.allDoc = WorkspaceContext.temp;
+                        for (let j = 0; j < docTemp.length; j++) {
+                            let doc = docTemp[j];
+                            if (!(isUndefined(doc))) {
+                                temp.push(RobotDoc.parseDocument(doc));
+                            }
+                        }
+                        WorkspaceContext.allRobotDoc = temp;
+                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
+                            let doc = WorkspaceContext.allRobotDoc[j];
+                            doc.searchResources();
+                        }
+                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
+                            let doc = WorkspaceContext.allRobotDoc[j];
+                            doc.scanAllResources();
+                            doc.assignGlobalVariables();
+                            doc.scanAllString();
+                        }
                         console.log(
-                            "finished scanning " + WorkspaceContext.allDoc.length + " robot and txt document"
+                            "finished scanning " + WorkspaceContext.allRobotDoc.length + " robot and txt document"
                         );
                         WorkspaceContext.asyncReadingCounter = 0;
                     }
@@ -124,7 +159,7 @@ export class WorkspaceContext {
                 allFiles = allFiles.concat(WorkspaceContext.getAllDirAndDocPath(directory))
             }
             else if (fs.lstatSync(paths[i]).isFile()) {
-                if (/(\.robot|\.txt)$/.test(paths[i])) {
+                if (/(\.robot|\.txt)$/.test(paths[i]) && !(/^\./.test(paths[i]))) {
                     allFiles.push(paths[i]);
                 }
             }

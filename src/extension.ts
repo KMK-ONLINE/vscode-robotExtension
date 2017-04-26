@@ -55,9 +55,6 @@ export function activate(context: vscode.ExtensionContext) {
 		)
 	);
 	context.subscriptions.push(
-		vscode.window.onDidChangeVisibleTextEditors(WorkspaceContext.scanWorkspace)
-	);
-	context.subscriptions.push(
 		vscode.window.onDidChangeActiveTextEditor(WorkspaceContext.scanWorkspace)
 	);
 }

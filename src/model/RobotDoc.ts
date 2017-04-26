@@ -6,8 +6,9 @@ import { Keyword } from './Keyword';
 import { Variable } from './Variable';
 import { TextDocument, Position } from 'vscode';
 import { WorkspaceContext } from '../WorkspaceContext';
-import { searchResources } from '../helper/ResourceHelper';
+import { getDocResources } from '../helper/ResourceHelper';
 import { LIB } from '../dictionary/KeywordDictionary'
+import { isNullOrUndefined } from 'util';
 
 /**
  * RobotDoc class which contains document's keywords, variables and its resources
@@ -17,15 +18,20 @@ export class RobotDoc {
     private _keywords: Keyword[];
     private _variables: Variable[];
     private _doc: TextDocument;
-    private _resources: TextDocument[];
+    private _resources: RobotDoc[];
+    private _allResources: RobotDoc[];
+    private _allResourcesName: string[];
+    private _keywordsName: string[];
+    private _allExistKeywordsFullName: string[];
+    private _allExistKeywordsName: string[];
+    private _allExistVariables: string[];
 
     private constructor(
-        document: TextDocument, keywords: Keyword[], variables: Variable[], resources: TextDocument[]
+        document: TextDocument, keywords: Keyword[], variables: Variable[]
     ) {
         this._doc = document;
         this._keywords = keywords;
         this._variables = variables;
-        this._resources = resources;
     }
 
     /**
@@ -36,9 +42,7 @@ export class RobotDoc {
     public static parseDocument(document: TextDocument): RobotDoc {
         let variables = searchVariables(document);
         let keywords = searchKeywords(document);
-        let resources = searchResources(document);
-        let result = new RobotDoc(document, keywords, variables, resources);
-        result.assignGlobalVariables();
+        let result = new RobotDoc(document, keywords, variables);
         return result;
     }
 
@@ -47,7 +51,7 @@ export class RobotDoc {
      */
     get name() {
         let path = this.document.fileName;
-        let nameWithExtension = path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
+        let nameWithExtension = path.match(/([-_]*|\w+)+\.?\w*$/)[0];
         return nameWithExtension.replace(/\.\w+$/, "");
     }
 
@@ -98,10 +102,7 @@ export class RobotDoc {
         return Array.from(docVarNames);
     }
 
-    /**
-     * all variable names in the document and its resources
-     */
-    get allIncludedVariablesName(): string[] {
+    private scanIncludedVariablesName() {
         let varNames: Set<string> = new Set(this.allVariablesName);
         let resources = this.allResources;
         for (let i = 0; i < resources.length; i++) {
@@ -112,7 +113,14 @@ export class RobotDoc {
                 varNames.add(name);
             }
         }
-        return Array.from(varNames);
+        this._allExistVariables = Array.from(varNames);
+    }
+
+    /**
+     * all variable names in the document and its resources
+     */
+    get allIncludedVariablesName(): string[] {
+        return this._allExistVariables;
     }
 
     /**
@@ -122,42 +130,49 @@ export class RobotDoc {
         return this._keywords;
     }
 
-    /**
-     * document's keywords name
-     */
-    get keywordsName() {
+    private scanAllKeywordsName() {
         let keywords = this.keywords;
         let result: string[] = [];
         for (let i = 0; i < keywords.length; i++) {
             result.push(keywords[i].name);
         }
-        return result;
+        this._keywordsName = result;
+    }
+
+    /**
+     * document's keywords name
+     */
+    get keywordsName() {
+        return this._keywordsName;
+    }
+
+    private scanAllExistKeywordsFullName() {
+        let keyNames: string[] = [];
+        let resources = this.resources;
+        if (isNullOrUndefined(this._allExistKeywordsFullName)) {
+            this._allExistKeywordsFullName = [];
+        }
+        for (let i = 0; i < resources.length; i++) {
+            if (isNullOrUndefined(resources[i].allExistKeywordsFullName)) {
+                resources[i]._allExistKeywordsFullName = [];
+                for (let j = 0; j < resources[i].keywords.length; j++) {
+                    resources[i].allExistKeywordsFullName.push(resources[i].keywords[j].fullName);
+                }
+                resources[i]._allExistKeywordsFullName = resources[i]._allExistKeywordsFullName.concat(resources[i]._allExistKeywordsName);
+                resources[i].scanAllExistKeywordsFullName();
+            }
+            this._allExistKeywordsFullName = this._allExistKeywordsFullName.concat(resources[i]._allExistKeywordsFullName);
+        }
     }
 
     /**
      * document's and its resources's keywords full name with its resource origin
      */
     get allExistKeywordsFullName(): string[] {
-        let keyNames: string[] = [];
-        let resources = this.allResources;
-        for (let i = 0; i < resources.length; i++) {
-            let resource = resources[i];
-            let keywords = resource.keywords;
-            for (let j = 0; j < keywords.length; j++) {
-                let key = keywords[j]
-                let name = key.name;
-                let fullName = keywords[j].fullName;
-                keyNames.push(name);
-                keyNames.push(fullName);
-            }
-        }
-        return keyNames;
+        return this._allExistKeywordsFullName;
     }
 
-    /**
-     * document's and its resources's keywords name
-     */
-    get allExistKeywordsName(): string[] {
+    private scanAllExistKeywordsName() {
         let keyNames: string[] = [];
         let resources = this.allResources;
         for (let i = 0; i < resources.length; i++) {
@@ -168,7 +183,14 @@ export class RobotDoc {
                 keyNames.push(name);
             }
         }
-        return keyNames;
+        this._allExistKeywordsName = keyNames;
+    }
+
+    /**
+     * document's and its resources's keywords name
+     */
+    get allExistKeywordsName(): string[] {
+        return this._allExistKeywordsName;
     }
 
     /**
@@ -182,18 +204,6 @@ export class RobotDoc {
      * document's resources
      */
     get resources() {
-        let res: RobotDoc[] = [];
-        for (let i = 0; i < this._resources.length; i++) {
-            let resource = RobotDoc.parseDocument(this._resources[i]);
-            res.push(resource);
-        }
-        return res;
-    }
-
-    /**
-     * document's resources in TextDocument object form
-     */
-    get rawResources() {
         return this._resources;
     }
 
@@ -201,21 +211,35 @@ export class RobotDoc {
      * all of document's resources included its direct include
      */
     get allResources() {
+        return this._allResources;
+    }
+
+    public scanAllResources() {
         let container: RobotDoc[] = [this];
         container = this.scanResources(container);
-        return container;
+        this._allResources = container;
+    }
+
+    public scanAllResourcesName() {
+        let resName: string[] = [];
+        let resources = this.resources;
+        if (isNullOrUndefined(this.allResourcesName)) {
+            this._allResourcesName = [];
+        }
+        for (let i = 0; i < resources.length; i++) {
+            if (isNullOrUndefined(resources[i]._allResourcesName)) {
+                this._allResourcesName.push(resources[i].name);
+                resources[i].scanAllResourcesName();
+            }
+            this._allResourcesName = this._allResourcesName.concat(resources[i].allResourcesName);
+        }
     }
 
     /**
      * all of document's resources name included its direct include
      */
     get allResourcesName() {
-        let resources = this.allResources;
-        let result: string[] = [];
-        for (let i = 0; i < resources.length; i++) {
-            result.push(resources[i].name);
-        }
-        return result;
+        return this._allResourcesName;
     }
 
     /**
@@ -246,6 +270,10 @@ export class RobotDoc {
         return libs;
     }
 
+    public searchResources() {
+        this._resources = getDocResources(this.document);
+    }
+
     /**
      * Method to get Variable object exist in the document using its position
      * 
@@ -257,7 +285,7 @@ export class RobotDoc {
         for (let i = 0; i < this._variables.length; i++) {
             let variable = this._variables[i];
             if (variable.location.range.contains(position)) {
-                return variable;
+                return variable.origin;
             }
         }
         return null;
@@ -321,6 +349,14 @@ export class RobotDoc {
         return [];
     }
 
+    public scanAllString() {
+        this.scanAllResourcesName();//need optimized
+        this.scanAllKeywordsName();
+        this.scanAllExistKeywordsName();
+        this.scanAllExistKeywordsFullName();//need optimized
+        this.scanIncludedVariablesName();
+    }
+
     /**
      * Method to get keyword's name which available in the document's resource by its resource name
      * 
@@ -329,10 +365,10 @@ export class RobotDoc {
      * @return Array of keywords name found. it will return empty array if resource or keyword is not found
      */
     public getKeywordsNameByResourceName(fileName: string) {
-        let resources = this.allResources;
+        let resources = this.allResourcesName;
         for (let i = 0; i < resources.length; i++) {
-            if (resources[i].name == fileName) {
-                return resources[i].keywordsName;
+            if (resources[i] == fileName) {
+                return this.allResources[i].keywordsName;
             }
         }
         return [];
@@ -384,7 +420,7 @@ export class RobotDoc {
         return this._doc.uri.fsPath == doc.document.uri.fsPath;
     }
 
-    private assignGlobalVariables() {
+    public assignGlobalVariables() {
         let variables = this.usedVariables;
         let included = this.allResources;
         let defines = this.variableDefinitions;
@@ -411,20 +447,26 @@ export class RobotDoc {
     private scanResources(container: RobotDoc[]): RobotDoc[] {
         let length = container.length;
         if (container.length < WorkspaceContext.size()) {
-            let temp = this.rawResources;
-            for (let i = 0; i < temp.length; i++) {
-                let cLength = container.length;
-                let equal = false;
-                for (let j = 0; j < cLength; j++) {
-                    if (container[j].document == temp[i]) {
-                        equal = true;
+            if (isNullOrUndefined(this.allResources)) {
+                let temp = this.resources;
+                for (let i = 0; i < temp.length; i++) {
+                    let cLength = container.length;
+                    let equal = false;
+                    for (let j = 0; j < cLength; j++) {
+                        if (container[j] == temp[i]) {
+                            equal = true;
+                            break;
+                        }
+                    }
+                    if (!equal) {
+                        let robotDoc = temp[i];
+                        container.push(robotDoc);
+                        container = robotDoc.scanResources(container);
                     }
                 }
-                if (!equal) {
-                    let robotDoc = RobotDoc.parseDocument(temp[i])
-                    container.push(robotDoc);
-                    container = robotDoc.scanResources(container);
-                }
+            }
+            else {
+                container.concat(this.allResources);
             }
         }
         return container;

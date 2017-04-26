@@ -1,4 +1,5 @@
 'use strict';
+import { WorkspaceContext } from '../../WorkspaceContext';
 
 import { RobotDoc } from '../../model/RobotDoc';
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
@@ -12,7 +13,7 @@ export class RobotVariableCompletionProvider implements CompletionItemProvider {
         let line = document.lineAt(position).text;
         let lastWhite = RobotVariableCompletionProvider.searchDollar(line, position);
         let subLine = line.substr(lastWhite);
-        let thisDoc = RobotDoc.parseDocument(document);
+        let thisDoc = WorkspaceContext.getDocumentByUri(document.uri)
         let vars = thisDoc.allIncludedVariablesName;
         if (/^\$\{/.test(subLine)) {
             return stringArrayToCompletionItems(vars, CompletionItemKind.Variable);

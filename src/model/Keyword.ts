@@ -56,11 +56,10 @@ export class Keyword extends Member {
      */
     get allReferences(): Member[] {
         let result: Member[] = [this];
-        let doc = WorkspaceContext.getDocumentByUri(this.location.uri);
-        let thisDoc = RobotDoc.parseDocument(doc);
+        let thisDoc = WorkspaceContext.getDocumentByUri(this.location.uri);
         let workspace = WorkspaceContext.getAllDocuments();
         for (let i = 0; i < workspace.length; i++) {
-            let workDoc = RobotDoc.parseDocument(workspace[i]);
+            let workDoc = workspace[i];
             let workDocRes = workDoc.allResources;
             let check = false;
             for (let j = 0; j < workDocRes.length; j++) {
@@ -71,15 +70,15 @@ export class Keyword extends Member {
                 }
             }
             if (check) {
-                for (let j = 0; j < workspace[i].lineCount; j++) {
-                    let line = workspace[i].lineAt(j).text;
+                for (let j = 0; j < workspace[i].document.lineCount; j++) {
+                    let line = workspace[i].document.lineAt(j).text;
                     if (/^\s{2,}/.test(line)) {
                         let found = line.indexOf(this.name);
                         while (found >= 0) {
                             let start = new Position(j, found);
                             let end = new Position(j, found + this.name.length);
                             let range = new Range(start, end);
-                            let loc = new Location(workspace[i].uri, range);
+                            let loc = new Location(workspace[i].document.uri, range);
                             let member = new Member(this.name, loc);
                             result.push(member);
                             found = line.indexOf(this.name, end.character);

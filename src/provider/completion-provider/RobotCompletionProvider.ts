@@ -57,7 +57,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private static matchLastSentence(firstSentences: string, document: TextDocument): CompletionItem[] {
-		let thisDoc = RobotDoc.parseDocument(document);
+		let thisDoc = WorkspaceContext.getDocumentByUri(document.uri)
 		let local = stringArrayToCompletionItems(
 			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.keywordsName), CompletionItemKind.Function
 		);
@@ -75,7 +75,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private static matchFileLastSentence(fileName: string, firstSentences: string, document: TextDocument): CompletionItem[] {
-		let doc = RobotDoc.parseDocument(document);
+		let doc = WorkspaceContext.getDocumentByUri(document.uri)
 		let keywords = doc.getKeywordsNameByResourceName(fileName);
 		let completionItem = stringArrayToCompletionItems(
 			RobotCompletionProvider.firstMatcher(firstSentences, keywords), CompletionItemKind.Function
@@ -84,7 +84,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private static matchKeyword(document: TextDocument): CompletionItem[] {
-		let thisDoc = RobotDoc.parseDocument(document);
+		let thisDoc = WorkspaceContext.getDocumentByUri(document.uri)
 		let included = stringArrayToCompletionItems(thisDoc.allResourcesName, CompletionItemKind.Class);
 		let localKeyComplete = stringArrayToCompletionItems(thisDoc.keywordsName, CompletionItemKind.Function);
 		let keyComplete = stringArrayToCompletionItems(

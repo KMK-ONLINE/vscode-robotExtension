@@ -1,4 +1,5 @@
 'use strict';
+import { WorkspaceContext } from '../../WorkspaceContext';
 import { RobotDoc } from '../../model/RobotDoc';
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
 import { getDocKeyByPos } from '../../helper/KeywordHelper';
@@ -24,7 +25,7 @@ export class RobotDotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private static matchJustKeyword(document: TextDocument, fileName: string): CompletionItem[] {
-		let doc = RobotDoc.parseDocument(document);
+		let doc = WorkspaceContext.getDocumentByUri(document.uri)
 		let keywords = doc.getKeywordsNameByResourceName(fileName);
 		let completionItem = stringArrayToCompletionItems(keywords, CompletionItemKind.Function);
 		return completionItem;

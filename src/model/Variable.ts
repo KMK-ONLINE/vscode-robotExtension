@@ -95,8 +95,7 @@ export class Variable extends Member {
             return this;
         }
         else {
-            let doc = WorkspaceContext.getDocumentByUri(this.location.uri);
-            let robotDoc = RobotDoc.parseDocument(doc);
+            let robotDoc = WorkspaceContext.getDocumentByUri(this.location.uri);
             let allResources = [robotDoc].concat(robotDoc.allResources);
             for (let i = 0; i < allResources.length; i++) {
                 let resource = allResources[i];
@@ -122,11 +121,10 @@ export class Variable extends Member {
             if (origin != this) {
                 result.push(origin);
             }
-            let doc = WorkspaceContext.getDocumentByUri(origin.location.uri);
-            let originDoc = RobotDoc.parseDocument(doc);
+            let originDoc = WorkspaceContext.getDocumentByUri(origin.location.uri);
             let workspace = WorkspaceContext.getAllDocuments();
             for (let i = 0; i < workspace.length; i++) {
-                let workDoc = RobotDoc.parseDocument(workspace[i]);
+                let workDoc = workspace[i];
                 let workDocRes = workDoc.allResources;
                 let check = false;
                 for (let j = 0; j < workDocRes.length; j++) {

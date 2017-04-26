@@ -1,4 +1,5 @@
 'use strict';
+import { RobotDoc } from '../model/RobotDoc';
 
 import { TextDocument } from 'vscode';
 import { removeSamePath } from '../Util';
@@ -11,9 +12,9 @@ import { WorkspaceContext } from '../WorkspaceContext';
  * 
  * @return Array of TextDocument, it will return empty array if resources are not found
  */
-export function searchResources(document: TextDocument): TextDocument[] {
+export function getDocResources(document: TextDocument): RobotDoc[] {
     let fileLength = document.lineCount;
-    let resources: TextDocument[] = [];
+    let resources: RobotDoc[] = [];
     for (let i = 0; i < fileLength; i++) {
         let line = document.lineAt(i).text;
         let matches = line.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
@@ -36,7 +37,7 @@ export function searchResources(document: TextDocument): TextDocument[] {
  * @return TextDocument object
  */
 export function searchOriginDocumentByRelativePath(thisDocument: TextDocument, filePath: string)
-    : TextDocument {
+    : RobotDoc {
     return WorkspaceContext.getDocumentByPath(
         searchOriginByRelativePath(thisDocument, filePath)
     );
