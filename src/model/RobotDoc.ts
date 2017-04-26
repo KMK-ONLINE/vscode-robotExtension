@@ -284,14 +284,6 @@ export class RobotDoc {
         return [];
     }
 
-    public scanAllString() {
-        this.scanAllResourcesName();//need optimized
-        this.scanAllKeywordsName();
-        this.scanAllExistKeywordsName();
-        this.scanAllExistKeywordsFullName();//need optimized
-        this.scanIncludedVariablesName();
-    }
-
     /**
      * Method to get keyword's name which available in the document's resource by its resource name
      * 
@@ -380,6 +372,17 @@ export class RobotDoc {
                 }
             }
         }
+    }
+
+    /**
+     * Procedure to scan all resources name, keywords name, etc included in document for the autocomplete to get
+     */
+    public scanAllString() {
+        this.scanAllResourcesName();
+        this.scanAllKeywordsName();
+        this.scanAllExistKeywordsName();
+        this.scanAllExistKeywordsFullName();
+        this.scanIncludedVariablesName();
     }
 
     /**
