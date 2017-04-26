@@ -4,6 +4,7 @@ All notable changes to the "robotf-extension" extension will be documented in th
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Released]
+
 ## [1.5.1] 26-apr-17
 ### Fixed
 - Optimized the performance

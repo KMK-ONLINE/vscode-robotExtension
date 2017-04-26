@@ -1,8 +1,6 @@
 'use strict'
 
-var queue = require('bull');
-import { async } from 'async';
-import { isUndefined } from 'util';
+import { isNullOrUndefined } from 'util';
 import { RobotDoc } from './model/RobotDoc';
 import { workspace, TextDocument, Uri } from 'vscode';
 import fs = require('fs');
@@ -15,7 +13,7 @@ export class WorkspaceContext {
     private static allRobotDoc: RobotDoc[];
     private static allPath: string[] = [];
     private static asyncReadingCounter: number = 0;
-    private static event: number = 0;
+
     /**
      * Function to get number of robot document in the workspace
      */
@@ -84,61 +82,46 @@ export class WorkspaceContext {
             let temp: RobotDoc[] = [];
             WorkspaceContext.asyncReadingCounter += WorkspaceContext.allPath.length;
             for (let i = 0; i < WorkspaceContext.allPath.length; i++) {
-                let opener = workspace.openTextDocument(Uri.file(WorkspaceContext.allPath[i])).then((document) => {
-                    docTemp.push(document);
-                    WorkspaceContext.asyncReadingCounter--;
-                    if (WorkspaceContext.asyncReadingCounter == 1) {
-                        for (let j = 0; j < docTemp.length; j++) {
-                            let doc = docTemp[j];
-                            if (!(isUndefined(doc))) {
-                                temp.push(RobotDoc.parseDocument(doc));
-                            }
+                let opener = workspace.openTextDocument(
+                    Uri.file(WorkspaceContext.allPath[i])).then((document) => {
+                        docTemp.push(document);
+                        WorkspaceContext.asyncReadingCounter--;
+                        if (WorkspaceContext.asyncReadingCounter == 1) {
+                            WorkspaceContext.finalScan(docTemp, temp);
                         }
-                        WorkspaceContext.allRobotDoc = temp;
-                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
-                            let doc = WorkspaceContext.allRobotDoc[j];
-                            doc.searchResources();
+                    }, (reason) => {
+                        console.log(reason);
+                        WorkspaceContext.asyncReadingCounter--;
+                        if (WorkspaceContext.asyncReadingCounter == 1) {
+                            WorkspaceContext.finalScan(docTemp, temp);
                         }
-                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
-                            let doc = WorkspaceContext.allRobotDoc[j];
-                            doc.scanAllResources();
-                            doc.assignGlobalVariables();
-                            doc.scanAllString();
-                        }
-                        console.log(
-                            "finished scanning " + WorkspaceContext.allRobotDoc.length + " robot and txt document"
-                        );
-                        WorkspaceContext.asyncReadingCounter = 0;
-                    }
-                }, (reason) => {
-                    console.log(reason);
-                    WorkspaceContext.asyncReadingCounter--;
-                    if (WorkspaceContext.asyncReadingCounter == 1) {
-                        for (let j = 0; j < docTemp.length; j++) {
-                            let doc = docTemp[j];
-                            if (!(isUndefined(doc))) {
-                                temp.push(RobotDoc.parseDocument(doc));
-                            }
-                        }
-                        WorkspaceContext.allRobotDoc = temp;
-                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
-                            let doc = WorkspaceContext.allRobotDoc[j];
-                            doc.searchResources();
-                        }
-                        for (let j = 0; j < WorkspaceContext.allRobotDoc.length; j++) {
-                            let doc = WorkspaceContext.allRobotDoc[j];
-                            doc.scanAllResources();
-                            doc.assignGlobalVariables();
-                            doc.scanAllString();
-                        }
-                        console.log(
-                            "finished scanning " + WorkspaceContext.allRobotDoc.length + " robot and txt document"
-                        );
-                        WorkspaceContext.asyncReadingCounter = 0;
-                    }
-                });
+                    });
             }
         }
+    }
+
+    private static finalScan(docs: TextDocument[], robotDocs: RobotDoc[]) {
+        for (let i = 0; i < docs.length; i++) {
+            let doc = docs[i];
+            if (!(isNullOrUndefined(doc))) {
+                robotDocs.push(RobotDoc.parseDocument(doc));
+            }
+        }
+        WorkspaceContext.allRobotDoc = robotDocs;
+        for (let i = 0; i < WorkspaceContext.allRobotDoc.length; i++) {
+            let doc = WorkspaceContext.allRobotDoc[i];
+            doc.searchResources();
+        }
+        for (let i = 0; i < WorkspaceContext.allRobotDoc.length; i++) {
+            let doc = WorkspaceContext.allRobotDoc[i];
+            doc.scanAllResources();
+            doc.assignGlobalVariables();
+            doc.scanAllString();
+        }
+        console.log(
+            "finished scanning " + WorkspaceContext.allRobotDoc.length + " robot and txt document"
+        );
+        WorkspaceContext.asyncReadingCounter = 0;
     }
 
     /**

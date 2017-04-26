@@ -20,12 +20,24 @@ export class RobotDoc {
     private _doc: TextDocument;
     private _resources: RobotDoc[];
     private _allResources: RobotDoc[];
+
+    /**
+     * all of variables here are added to prevent lazy file scanning for autocomplete provider, 
+     * so the autocomplete provider doesn't need to scan the file everytime,
+     * it increase performance like 5-20 times faster than before depends on complexity of resources
+     */
     private _allResourcesName: string[];
     private _keywordsName: string[];
     private _allExistKeywordsFullName: string[];
     private _allExistKeywordsName: string[];
     private _allExistVariables: string[];
 
+    /**
+     * This constructor is keep in private state because you're expected to get the document using parse static method
+     * @param document 
+     * @param keywords 
+     * @param variables 
+     */
     private constructor(
         document: TextDocument, keywords: Keyword[], variables: Variable[]
     ) {
@@ -102,20 +114,6 @@ export class RobotDoc {
         return Array.from(docVarNames);
     }
 
-    private scanIncludedVariablesName() {
-        let varNames: Set<string> = new Set(this.allVariablesName);
-        let resources = this.allResources;
-        for (let i = 0; i < resources.length; i++) {
-            let resource = resources[i];
-            let variables = resource.variableDefinitions;
-            for (let j = 0; j < variables.length; j++) {
-                let name = variables[j].name;
-                varNames.add(name);
-            }
-        }
-        this._allExistVariables = Array.from(varNames);
-    }
-
     /**
      * all variable names in the document and its resources
      */
@@ -130,15 +128,6 @@ export class RobotDoc {
         return this._keywords;
     }
 
-    private scanAllKeywordsName() {
-        let keywords = this.keywords;
-        let result: string[] = [];
-        for (let i = 0; i < keywords.length; i++) {
-            result.push(keywords[i].name);
-        }
-        this._keywordsName = result;
-    }
-
     /**
      * document's keywords name
      */
@@ -146,44 +135,11 @@ export class RobotDoc {
         return this._keywordsName;
     }
 
-    private scanAllExistKeywordsFullName() {
-        let keyNames: string[] = [];
-        let resources = this.resources;
-        if (isNullOrUndefined(this._allExistKeywordsFullName)) {
-            this._allExistKeywordsFullName = [];
-        }
-        for (let i = 0; i < resources.length; i++) {
-            if (isNullOrUndefined(resources[i].allExistKeywordsFullName)) {
-                resources[i]._allExistKeywordsFullName = [];
-                for (let j = 0; j < resources[i].keywords.length; j++) {
-                    resources[i].allExistKeywordsFullName.push(resources[i].keywords[j].fullName);
-                }
-                resources[i]._allExistKeywordsFullName = resources[i]._allExistKeywordsFullName.concat(resources[i]._allExistKeywordsName);
-                resources[i].scanAllExistKeywordsFullName();
-            }
-            this._allExistKeywordsFullName = this._allExistKeywordsFullName.concat(resources[i]._allExistKeywordsFullName);
-        }
-    }
-
     /**
      * document's and its resources's keywords full name with its resource origin
      */
     get allExistKeywordsFullName(): string[] {
         return this._allExistKeywordsFullName;
-    }
-
-    private scanAllExistKeywordsName() {
-        let keyNames: string[] = [];
-        let resources = this.allResources;
-        for (let i = 0; i < resources.length; i++) {
-            let resource = resources[i];
-            let keywords = resource.keywords;
-            for (let j = 0; j < keywords.length; j++) {
-                let name = keywords[j].name;
-                keyNames.push(name);
-            }
-        }
-        this._allExistKeywordsName = keyNames;
     }
 
     /**
@@ -212,27 +168,6 @@ export class RobotDoc {
      */
     get allResources() {
         return this._allResources;
-    }
-
-    public scanAllResources() {
-        let container: RobotDoc[] = [this];
-        container = this.scanResources(container);
-        this._allResources = container;
-    }
-
-    public scanAllResourcesName() {
-        let resName: string[] = [];
-        let resources = this.resources;
-        if (isNullOrUndefined(this.allResourcesName)) {
-            this._allResourcesName = [];
-        }
-        for (let i = 0; i < resources.length; i++) {
-            if (isNullOrUndefined(resources[i]._allResourcesName)) {
-                this._allResourcesName.push(resources[i].name);
-                resources[i].scanAllResourcesName();
-            }
-            this._allResourcesName = this._allResourcesName.concat(resources[i].allResourcesName);
-        }
     }
 
     /**
@@ -420,6 +355,9 @@ export class RobotDoc {
         return this._doc.uri.fsPath == doc.document.uri.fsPath;
     }
 
+    /**
+     * Procedure to assign true to isGlobal property to every global variables in the document
+     */
     public assignGlobalVariables() {
         let variables = this.usedVariables;
         let included = this.allResources;
@@ -444,6 +382,20 @@ export class RobotDoc {
         }
     }
 
+    /**
+     * Procedure to scan all included resources in the document
+     */
+    public scanAllResources() {
+        let container: RobotDoc[] = [this];
+        container = this.scanResources(container);
+        this._allResources = container;
+    }
+
+    /**
+     * Procedure to scan all included Resources recursively
+     *
+     * @param container 
+     */
     private scanResources(container: RobotDoc[]): RobotDoc[] {
         let length = container.length;
         if (container.length < WorkspaceContext.size()) {
@@ -470,5 +422,85 @@ export class RobotDoc {
             }
         }
         return container;
+    }
+
+    /**
+     * Method to scan all resourcesName included in the document
+     */
+    public scanAllResourcesName() {
+        let resName: string[] = [];
+        let resources = this.resources;
+        if (isNullOrUndefined(this.allResourcesName)) {
+            this._allResourcesName = [];
+        }
+        for (let i = 0; i < resources.length; i++) {
+            if (isNullOrUndefined(resources[i]._allResourcesName)) {
+                this._allResourcesName.push(resources[i].name);
+                resources[i].scanAllResourcesName();
+            }
+            this._allResourcesName = this._allResourcesName.concat(
+                resources[i].allResourcesName
+            );
+        }
+    }
+
+    private scanIncludedVariablesName() {
+        let varNames: Set<string> = new Set(this.allVariablesName);
+        let resources = this.allResources;
+        for (let i = 0; i < resources.length; i++) {
+            let resource = resources[i];
+            let variables = resource.variableDefinitions;
+            for (let j = 0; j < variables.length; j++) {
+                let name = variables[j].name;
+                varNames.add(name);
+            }
+        }
+        this._allExistVariables = Array.from(varNames);
+    }
+
+    private scanAllKeywordsName() {
+        let keywords = this.keywords;
+        let result: string[] = [];
+        for (let i = 0; i < keywords.length; i++) {
+            result.push(keywords[i].name);
+        }
+        this._keywordsName = result;
+    }
+
+    private scanAllExistKeywordsName() {
+        let keyNames: string[] = [];
+        let resources = this.allResources;
+        for (let i = 0; i < resources.length; i++) {
+            let resource = resources[i];
+            let keywords = resource.keywords;
+            for (let j = 0; j < keywords.length; j++) {
+                let name = keywords[j].name;
+                keyNames.push(name);
+            }
+        }
+        this._allExistKeywordsName = keyNames;
+    }
+
+    private scanAllExistKeywordsFullName() {
+        let keyNames: string[] = [];
+        let resources = this.resources;
+        if (isNullOrUndefined(this._allExistKeywordsFullName)) {
+            this._allExistKeywordsFullName = [];
+        }
+        for (let i = 0; i < resources.length; i++) {
+            if (isNullOrUndefined(resources[i].allExistKeywordsFullName)) {
+                resources[i]._allExistKeywordsFullName = [];
+                for (let j = 0; j < resources[i].keywords.length; j++) {
+                    resources[i].allExistKeywordsFullName.push(resources[i].keywords[j].fullName);
+                }
+                resources[i]._allExistKeywordsFullName = resources[i]._allExistKeywordsFullName.concat(
+                    resources[i]._allExistKeywordsName
+                );
+                resources[i].scanAllExistKeywordsFullName();
+            }
+            this._allExistKeywordsFullName = this._allExistKeywordsFullName.concat(
+                resources[i]._allExistKeywordsFullName
+            );
+        }
     }
 }
