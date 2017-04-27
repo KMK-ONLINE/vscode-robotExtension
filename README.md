@@ -74,7 +74,7 @@ Performance issues when handle more than 300++ files in workspace
 
 ## For Contributors
 
-You can added new suggestion library with its keywords at src/dictionary/KeywordDictionary.ts with format:
+- You can added new suggestion library with its keywords at src/dictionary/KeywordDictionary.ts with format:
 ``` typescript
 export var LIB =
 	[
@@ -86,6 +86,44 @@ export var LIB =
         ...
     ]
     
+```
+
+- Don't forget to add definition if you add new method, function, class or anything new:
+``` typescript
+/**
+ *  this is class for something
+ */
+export class MyClass{
+
+    /**
+     * This is method to do something
+     *
+     * @param args arguments of something
+     *
+     * @return something
+     */
+    public myMethod(args) : any {
+        .
+        .
+        .
+        return 0;
+    }
+
+}
+```
+
+- Don't forget to update the version on "package.json" and add changelog on "CHANGELOG.md" if you made some changes:
+``` javascript
+//package.json
+{
+    "name": "robotf-extension",
+    "displayName": "RobotF Extension",
+    "description": "Extension for robot framework",
+    "version": "1.5.1", //update this version
+    "publisher": "kmk-labs",
+    ..
+    ..
+}
 ```
 
 ## Release Notes
