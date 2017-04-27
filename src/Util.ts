@@ -83,3 +83,14 @@ export function subArrayOfString(list: string[], start: number): string[] {
     }
     return result;
 }
+
+/**
+ * Function to check is line is documentation or not
+ * 
+ * @param line 
+ * 
+ * @return boolean
+ */
+export function isInDocumentation(line: string){
+    return /^\s*\[Documentation\]/.test(line);
+}

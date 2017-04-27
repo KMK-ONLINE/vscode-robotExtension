@@ -3,25 +3,28 @@ import { WorkspaceContext } from '../../WorkspaceContext';
 import { RobotDoc } from '../../model/RobotDoc';
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
 import { getDocKeyByPos } from '../../helper/KeywordHelper';
-import { stringArrayToCompletionItems } from '../../Util';
+import { stringArrayToCompletionItems, isInDocumentation } from '../../Util';
 
 export class RobotDotCompletionProvider implements CompletionItemProvider {
 
 	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
 		: Thenable<CompletionItem[]> | CompletionItem[] {
 		let line = document.lineAt(position);
-		let keyword = getDocKeyByPos(document, position);
-		if (keyword != null) {
-			if (keyword.length == 2) {
-				return RobotDotCompletionProvider.matchJustKeyword(document, keyword[0]);
+		if (!isInDocumentation(line.text)) {
+			let keyword = getDocKeyByPos(document, position);
+			if (keyword != null) {
+				if (keyword.length == 2) {
+					return RobotDotCompletionProvider.matchJustKeyword(document, keyword[0]);
+				}
+			}
+			else {
+				let sub = position.character - line.firstNonWhitespaceCharacterIndex;
+				return [
+					new CompletionItem("...		".substr(sub), CompletionItemKind.Snippet)
+				]
 			}
 		}
-		else {
-			let sub = position.character - line.firstNonWhitespaceCharacterIndex;
-			return [
-				new CompletionItem("...		".substr(sub), CompletionItemKind.Snippet)
-			]
-		}
+		return null;
 	}
 
 	private static matchJustKeyword(document: TextDocument, fileName: string): CompletionItem[] {

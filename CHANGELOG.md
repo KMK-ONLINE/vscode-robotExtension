@@ -5,6 +5,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Released]
 
+## [1.5.2] 27-apr-17
+### Fixed
+- Improve the autocomplete suggestion
+
 ## [1.5.1] 26-apr-17
 ### Fixed
 - Optimized the performance
