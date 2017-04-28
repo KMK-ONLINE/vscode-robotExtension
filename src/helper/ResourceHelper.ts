@@ -17,7 +17,7 @@ export function getDocResources(document: TextDocument): RobotDoc[] {
     let resources: RobotDoc[] = [];
     for (let i = 0; i < fileLength; i++) {
         let line = document.lineAt(i).text;
-        let matches = line.match(/^Resource\s+(\S+\.(robot|txt))\s*$/);
+        let matches = line.match(/^Resource\s+((\S+\s?\S+)+\.(robot|txt))\s*$/);
         if (matches) {
             let docs = searchOriginDocumentByRelativePath(document, matches[1]);
             if (docs != null) {
@@ -52,10 +52,10 @@ export function searchOriginDocumentByRelativePath(thisDocument: TextDocument, f
  * @return absolute path of the relative path 
  */
 export function searchOriginByRelativePath(thisDocument: TextDocument, filePath: string): string {
-    let thisFolderPath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.?\w*$/, "");
+    let thisFolderPath = thisDocument.fileName.replace(/([^\/\\])+$/, "");
     while (/^\.\.\.?\//.test(filePath)) {
         filePath = filePath.replace(/^\.\.\.?\//, "");
-        thisFolderPath = thisFolderPath.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+(\/|\\)$/, "");
+        thisFolderPath = thisFolderPath.replace(/([^\/\\])+(\/|\\)$/, "");
     }
     return thisFolderPath + filePath;
 }
@@ -71,12 +71,12 @@ export function searchOriginByRelativePath(thisDocument: TextDocument, filePath:
  */
 export function formatResource(thisDocument: TextDocument, start: string, path: string)
     : string {
-    let filePath = thisDocument.fileName.replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+\.\w+$/, "").replace(/\\/g, "/");
+    let filePath = thisDocument.fileName.replace(/([^\/\\])+\.\w+$/, "").replace(/\\/g, "/");
     path = path.replace(/\\/g, "/");
     let temp = removeSamePath(filePath, path);
     let format: string;
-    while (/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/.test(temp[0])) {
-        temp[0] = temp[0].replace(/([!"#%&'*+,.:<=>@_`~-]*|\w+)+[\\\/]$/, "");
+    while (/([^\/\\])+[\\\/]$/.test(temp[0])) {
+        temp[0] = temp[0].replace(/([^\/\\])+[\\\/]$/, "");
         temp[1] = "../" + temp[1];
     }
     return (start + temp[1]);
