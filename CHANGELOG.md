@@ -5,7 +5,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Released]
 
-## [1.5.3] 27-apr-17
+## [1.5.4] 28-apr-17
+### Fixed
+- Improve the autocomplete suggestion
+
+## [1.5.3] 28-apr-17
 ### Fixed
 - Document did not scanned when there is space in file name now fixed
 
