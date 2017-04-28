@@ -91,6 +91,6 @@ export function subArrayOfString(list: string[], start: number): string[] {
  * 
  * @return boolean
  */
-export function isInDocumentation(line: string){
-    return /^\s*\[Documentation\]/.test(line);
+export function isIgnoreCompletion(line: string){
+    return /^\s*\[(Documentation|\d+|Tags)\]/.test(line);
 }

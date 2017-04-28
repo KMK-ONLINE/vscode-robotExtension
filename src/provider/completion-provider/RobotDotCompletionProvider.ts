@@ -3,14 +3,14 @@ import { WorkspaceContext } from '../../WorkspaceContext';
 import { RobotDoc } from '../../model/RobotDoc';
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
 import { getDocKeyByPos } from '../../helper/KeywordHelper';
-import { stringArrayToCompletionItems, isInDocumentation } from '../../Util';
+import { stringArrayToCompletionItems, isIgnoreCompletion } from '../../Util';
 
 export class RobotDotCompletionProvider implements CompletionItemProvider {
 
 	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
 		: Thenable<CompletionItem[]> | CompletionItem[] {
 		let line = document.lineAt(position);
-		if (!isInDocumentation(line.text)) {
+		if (!isIgnoreCompletion(line.text)) {
 			let keyword = getDocKeyByPos(document, position);
 			if (keyword != null) {
 				if (keyword.length == 2) {

@@ -4,7 +4,7 @@ import { WorkspaceContext } from '../../WorkspaceContext';
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
 import { formatResources, formatFullResources } from '../../helper/ResourceHelper';
 import { getDocKeyByPos } from '../../helper/KeywordHelper';
-import { stringArrayToCompletionItems, isInDocumentation } from '../../Util';
+import { stringArrayToCompletionItems, isIgnoreCompletion } from '../../Util';
 import { SYNTAX } from '../../dictionary/KeywordDictionary';
 import { RobotDoc } from '../../model/RobotDoc';
 
@@ -13,7 +13,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
 		: Thenable<CompletionItem[]> | CompletionItem[] {
 		let line = document.lineAt(position);
-		if (!isInDocumentation(line.text)) {
+		if (!isIgnoreCompletion(line.text)) {
 			let keyword = getDocKeyByPos(document, position);
 			let resourceMatcher1 = line.text.match(/^([rR][eE]?[sS]?[oO]?[uU]?[rR]?[cC]?[eE]?)$/);
 			let resourceMatcher2 = line.text.match(/^Resource\s{2,}(([-_]+|\w+)+)\s*$/);

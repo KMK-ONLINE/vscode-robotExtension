@@ -1,7 +1,7 @@
 'use strict';
 
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
-import { subArrayOfString, stringArrayToCompletionItems, isInDocumentation } from '../../Util';
+import { subArrayOfString, stringArrayToCompletionItems, isIgnoreCompletion } from '../../Util';
 
 export class RobotBuiltInProvider implements CompletionItemProvider {
 
@@ -26,7 +26,7 @@ export class RobotBuiltInProvider implements CompletionItemProvider {
     public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
         : Thenable<CompletionItem[]> | CompletionItem[] {
         let line = document.lineAt(position).text;
-        if (!isInDocumentation(line)) {
+        if (!isIgnoreCompletion(line)) {
             let char = line.charAt(position.character - 1);
             if (char == "*") {
                 let sub = position.character - document.lineAt(position).firstNonWhitespaceCharacterIndex;
