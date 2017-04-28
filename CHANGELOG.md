@@ -63,6 +63,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Bug Fix
 - Various Bug Fix
+
 ## [1.1.0]
 ### Added
 - Added definition provider
