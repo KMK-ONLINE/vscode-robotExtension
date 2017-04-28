@@ -70,7 +70,7 @@ You need to have robotframework language support for visual studio code
 
 ## Known Issues
 
-Performance issues when handle more than 300++ files in workspace
+Little performance issues when scanning when handle more than 300++ files whith complex structure in workspace
 
 ## For Contributors
 
