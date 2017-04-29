@@ -63,7 +63,7 @@ export class RobotDoc {
      */
     get name() {
         let path = this.document.fileName;
-        let nameWithExtension = path.match(/([-_]*|\w+)+\.?\w*$/)[0];
+        let nameWithExtension = path.match(/[^\\\/]+$/)[0];
         return nameWithExtension.replace(/\.\w+$/, "");
     }
 
@@ -292,9 +292,8 @@ export class RobotDoc {
      * @return Array of keywords name found. it will return empty array if resource or keyword is not found
      */
     public getKeywordsNameByResourceName(fileName: string) {
-        let resources = this.allResourcesName;
-        for (let i = 0; i < resources.length; i++) {
-            if (resources[i] == fileName) {
+        for (let i = 0; i < this.allResources.length; i++) {
+            if (this.allResources[i].name == fileName) {
                 return this.allResources[i].keywordsName;
             }
         }
@@ -494,7 +493,7 @@ export class RobotDoc {
             if (isNullOrUndefined(resources[i].allExistKeywordsFullName)) {
                 resources[i]._allExistKeywordsFullName = [];
                 for (let j = 0; j < resources[i].keywords.length; j++) {
-                    resources[i].allExistKeywordsFullName.push(resources[i].keywords[j].fullName);
+                    resources[i]._allExistKeywordsFullName.push(resources[i].keywords[j].fullName);
                 }
                 resources[i]._allExistKeywordsFullName = resources[i]._allExistKeywordsFullName.concat(
                     resources[i]._allExistKeywordsName
