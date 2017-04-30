@@ -5,6 +5,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Released]
 
+## [1.5.9] 30-apr-17
+### Added
+- Appium Library, Process Library and DateTime Library
+
 ## [1.5.6] 30-apr-17
 ### Fixed
 - Some document did not scanned now fixed

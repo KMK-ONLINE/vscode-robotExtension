@@ -25,6 +25,35 @@ export var SYNTAX: string[] = [
 export var LIB =
 	[
 		{
+			name: "AppiumLibrary",
+			key: [
+				"Background App", "Capture Page Screenshot", "Clear Text", "Click Button", "Click Element", "Close All Applications", 
+				"Close Application", "Element Name Should Be", "Element Should Be Disabled", "Element Should Be Enabled", "Get Contexts", 
+				"Get Current Context", "Get Network Connection Status", "Get Source", "Go Back", "Go To Url", "Hide Keyboard", "Input Password", 
+				"Input Text", "Input Value", "Lock", "Log Source", "Long Press", "Long Press Keycode", "Open Application", 
+				"Page Should Contain Element", "Page Should Contain Text", "Page Should Not Contain Element", "Page Should Not Contain Text", 
+				"Pinch", "Press Keycode", "Pull File", "Pull Folder", "Push File", "Register Keyword To Run On Failure", "Remove Application", 
+				"Reset Application", "Scroll", "Set Network Connection Status", "Shake", "Swipe", "Switch Application", "Switch To Context", 
+				"Tap", "Wait Until Page Contains", "Wait Until Page Contains Element", "Wait Until Page Does Not Contain", 
+				"Wait Until Page Does Not Contain Element", "Zoom"
+			]
+		},
+		{
+			name: "Process",
+			key: [
+				"Get Process Id", "Get Process Object", "Get Process Result", "Is Process Running", "Join Command Line", "Process Should Be Running", 
+				"Process Should Be Stopped", "Run Process", "Send Signal To Process", "Split Command Line", "Start Process", "Switch Process", 
+				"Terminate All Processes", "Terminate Process", "Wait For Process"
+			]
+		},
+		{
+			name: "DateTime",
+			key: [
+				"Add Time To Date", "Add Time To Time", "Convert Date", "Convert Time", "Get Current Date", "Subtract Date From Date", 
+				"Subtract Time From Date", "Subtract Time From Time"
+			]
+		},
+		{
 			name: "Dialogs",
 			key: [
 				"Execute Manual Step", "Get Selection From User", "Get Value From User", "Pause Execution"
