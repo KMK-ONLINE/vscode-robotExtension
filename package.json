@@ -4,6 +4,7 @@
     "description": "Extension for robot framework",
     "version": "1.5.6",
     "publisher": "kmk-labs",
+    "icon": "./icon.png",
     "engines": {
         "vscode": "^1.11.0"
     },
