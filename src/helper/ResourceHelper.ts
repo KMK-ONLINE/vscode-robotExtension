@@ -17,9 +17,9 @@ export function getDocResources(document: TextDocument): RobotDoc[] {
     let resources: RobotDoc[] = [];
     for (let i = 0; i < fileLength; i++) {
         let line = document.lineAt(i).text;
-        let matches = line.match(/^Resource\s+((\S+\s?\S+)+\.(robot|txt))\s*$/);
-        if (matches) {
-            let docs = searchOriginDocumentByRelativePath(document, matches[1]);
+        if (/^Resource\s{2,}/.test(line)) {
+            let match = line.replace(/\s+$/, "").split(/\s{2,}/);
+            let docs = searchOriginDocumentByRelativePath(document, match[1]);
             if (docs != null) {
                 resources.push(docs);
             }
@@ -53,8 +53,8 @@ export function searchOriginDocumentByRelativePath(thisDocument: TextDocument, f
  */
 export function searchOriginByRelativePath(thisDocument: TextDocument, filePath: string): string {
     let thisFolderPath = thisDocument.fileName.replace(/([^\/\\])+$/, "");
-    while (/^\.\.\.?\//.test(filePath)) {
-        filePath = filePath.replace(/^\.\.\.?\//, "");
+    while (/^\.\.\.?(\/|\\)/.test(filePath)) {
+        filePath = filePath.replace(/^\.\.\.?(\/|\\)/, "");
         thisFolderPath = thisFolderPath.replace(/([^\/\\])+(\/|\\)$/, "");
     }
     return thisFolderPath + filePath;

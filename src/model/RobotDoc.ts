@@ -182,14 +182,14 @@ export class RobotDoc {
      */
     get library(): string[] {
         let libs: string[] = [];
-        let resources = this.allResources;
+        let resources = this._allResources;
         let added: boolean[] = new Array(LIB.length);
         let addedLength = LIB.length;
         for (let i = 0; i < resources.length && addedLength > 0; i++) {
             let resource = resources[i].document;
             for (let i = 0; i < resource.lineCount; i++) {
-                let match = resource.lineAt(i).text.match(/^Library\s+(\w+)/);
-                if (match) {
+                if (/^Library\s+(\w+)/.test(resource.lineAt(i).text)) {
+                    let match = resource.lineAt(i).text.split(/\s{2,}/);
                     for (let j = 0; j < LIB.length; j++) {
                         if (!added[j]) {
                             if (LIB[j].name == match[1]) {
@@ -401,26 +401,21 @@ export class RobotDoc {
     private scanResources(container: RobotDoc[]): RobotDoc[] {
         let length = container.length;
         if (container.length < WorkspaceContext.size()) {
-            if (isNullOrUndefined(this.allResources)) {
-                let temp = this.resources;
-                for (let i = 0; i < temp.length; i++) {
-                    let cLength = container.length;
-                    let equal = false;
-                    for (let j = 0; j < cLength; j++) {
-                        if (container[j] == temp[i]) {
-                            equal = true;
-                            break;
-                        }
-                    }
-                    if (!equal) {
-                        let robotDoc = temp[i];
-                        container.push(robotDoc);
-                        container = robotDoc.scanResources(container);
+            let temp = this.resources;
+            for (let i = 0; i < temp.length; i++) {
+                let cLength = container.length;
+                let equal = false;
+                for (let j = 0; j < cLength; j++) {
+                    if (container[j].isEqual(temp[i])) {
+                        equal = true;
+                        break;
                     }
                 }
-            }
-            else {
-                container.concat(this.allResources);
+                if (!equal) {
+                    let robotDoc = temp[i];
+                    container.push(robotDoc);
+                    container = robotDoc.scanResources(container);
+                }
             }
         }
         return container;
@@ -431,17 +426,17 @@ export class RobotDoc {
      */
     public scanAllResourcesName() {
         let resName: string[] = [];
-        let resources = this.resources;
+        let resources = this._resources;
         if (isNullOrUndefined(this.allResourcesName)) {
             this._allResourcesName = [];
         }
         for (let i = 0; i < resources.length; i++) {
+            this._allResourcesName.push(resources[i].name);
             if (isNullOrUndefined(resources[i]._allResourcesName)) {
-                this._allResourcesName.push(resources[i].name);
                 resources[i].scanAllResourcesName();
             }
             this._allResourcesName = this._allResourcesName.concat(
-                resources[i].allResourcesName
+                resources[i]._allResourcesName
             );
         }
     }
@@ -490,7 +485,7 @@ export class RobotDoc {
             this._allExistKeywordsFullName = [];
         }
         for (let i = 0; i < resources.length; i++) {
-            if (isNullOrUndefined(resources[i].allExistKeywordsFullName)) {
+            if (isNullOrUndefined(resources[i]._allExistKeywordsFullName)) {
                 resources[i]._allExistKeywordsFullName = [];
                 for (let j = 0; j < resources[i].keywords.length; j++) {
                     resources[i]._allExistKeywordsFullName.push(resources[i].keywords[j].fullName);

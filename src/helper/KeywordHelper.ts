@@ -51,7 +51,7 @@ export function searchKeywords(file: TextDocument): Keyword[] {
     for (let i = 0; i < file.lineCount; i++) {
         let line = file.lineAt(i).text;
         if (!isInKeywordRange) {
-            isInKeywordRange = /^\*\*\*+\sKeywords\s\*\*\*/i.test(line)
+            isInKeywordRange = /^\*\*\*+\sKeywords?\s\*\*\*/i.test(line)
         }
         else {
             if (/^\*\*\*+\s[\w+\s?]+\s\*\*\*/.test(line)) {

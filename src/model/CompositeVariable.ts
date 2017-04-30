@@ -20,10 +20,10 @@ export class CompositeVariable extends Variable {
      * @param subVariable sub variable of composite variable
      * @param Location is location of variable
      */
-    public constructor(name: string, subVariable: Variable[], location: Location) {
+    public constructor(name: string, subVariable: Variable[], location: Location, isGlobal: boolean) {
         super(name, location, true);
-        this.isGlobal = true;
-        this.value = "composite";
+        this.isGlobal = isGlobal;
+        this.value = null;
         this._subVariable = subVariable;
     }
 
@@ -49,45 +49,23 @@ export class CompositeVariable extends Variable {
     }
 
     /**
-     * Method to get sub variable by its name, including dot
+     * Method to get sub variable by its name with no dot
      * 
-     * @param name name of sub variable, including dot
+     * @param name name of sub variable
      * 
      * @return Sub Variable
      */
     public getSubVariable(name: string): Variable {
         for (let i = 0; i < this._subVariable.length; i++) {
             let variable = this.subVariable[i];
-            if (this.name + "." + variable.name == name) {
+            if (variable.name == name) {
                 return variable;
             }
         }
     }
 
     get allReferences(): Variable[] {
-        let result: Variable[] = [this];
-        let originDoc = WorkspaceContext.getDocumentByUri(this.location.uri);
-        let workspace = WorkspaceContext.getAllDocuments();
-        for (let i = 0; i < workspace.length; i++) {
-            let workDoc = workspace[i];
-            let workDocRes = workDoc.allResources;
-            let check = false;
-            for (let j = 0; j < workDocRes.length; j++) {
-                let res = workDocRes[j];
-                if (res.isEqual(originDoc)) {
-                    check = true;
-                    break;
-                }
-            }
-            if (check) {
-                let vars = workDoc.usedVariables;
-                for (let j = 0; j < vars.length; j++) {
-                    
-                }
-            }
-        }
-        return result;
-
+        //need implementation
+        return;
     }
-
 }

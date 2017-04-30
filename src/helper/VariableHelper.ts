@@ -16,7 +16,7 @@ export function searchVariables(file: TextDocument): Variable[] {
     for (let i = 0; i < file.lineCount; i++) {
         let line = file.lineAt(i).text;
         if (!isInVariableField) {
-            isInVariableField = /^\*\*\*+\sVariable\s\*\*\*/i.test(line);
+            isInVariableField = /^\*\*\*+\sVariables?\s\*\*\*/i.test(line);
             if (!isInVariableField) {
                 let match = line.match(/\$\{[^${}]+\}/g);
                 if (match) {

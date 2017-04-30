@@ -13,7 +13,6 @@ import { WorkspaceContext } from './WorkspaceContext';
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("robotf extension is running");
-	WorkspaceContext.scanWorkspace();
 	context.subscriptions.push(
 		vscode.languages.registerCompletionItemProvider(
 			'robot', new RobotBuiltInProvider(), "*", "[", ":"
@@ -55,7 +54,14 @@ export function activate(context: vscode.ExtensionContext) {
 		)
 	);
 	context.subscriptions.push(
-		vscode.window.onDidChangeActiveTextEditor(WorkspaceContext.scanWorkspace)
+		vscode.workspace.onDidOpenTextDocument(WorkspaceContext.scanWorkspace)
+	);
+	context.subscriptions.push(
+		vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
+			if (e.contentChanges[e.contentChanges.length - 1].text.includes("\n")) {
+				Promise.resolve(WorkspaceContext.scanWorkspace());
+			}
+		})
 	);
 }
 
