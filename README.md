@@ -64,9 +64,23 @@ This Extension was created for internal use for Test Engineer at KMK-Labs, but p
 
 ![Keyword Hover](keyword-hover.png)
 
+## Configurations
+
+You can create default configuration for your workspace by creating config.json inside your workspace root folder:
+
+* Default Keyword Autocomplete Library
+    * You can set default autocomplete keyword from library you want across all your files in the workspace
+
+``` javascript
+//config.json
+{
+    "lib":["AppiumLibrary", "Process", ...] //it must be in array
+}
+```
+
 ## Requirements
 
-You need to have robotframework language support for visual studio code
+You need to have robotframework language support for visual studio code if you want text highlighter
 
 ## Known Issues
 
