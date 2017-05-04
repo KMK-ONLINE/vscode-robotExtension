@@ -8,6 +8,7 @@ import { WorkspaceContext } from '../WorkspaceContext';
 
 /**
  * class represent variable which have composite value
+ * STILL IN DEVELOPMENT
  */
 export class CompositeVariable extends Variable {
 

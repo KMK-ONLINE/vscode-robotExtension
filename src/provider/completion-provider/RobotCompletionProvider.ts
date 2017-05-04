@@ -3,7 +3,7 @@
 import { WorkspaceContext } from '../../WorkspaceContext';
 import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, CompletionItem, CancellationToken } from 'vscode';
 import { formatResources, formatFullResources } from '../../helper/ResourceHelper';
-import { getDocKeyByPos } from '../../helper/KeywordHelper';
+import { getDocKeyByPos, getConfigLibrary } from '../../helper/KeywordHelper';
 import { stringArrayToCompletionItems, isIgnoreCompletion } from '../../Util';
 import { SYNTAX } from '../../dictionary/KeywordDictionary';
 import { RobotDoc } from '../../model/RobotDoc';
@@ -68,7 +68,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.allExistKeywordsName), CompletionItemKind.Function
 		);
 		let libKey = stringArrayToCompletionItems(
-			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.library), CompletionItemKind.Function
+			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.library.concat(getConfigLibrary())), CompletionItemKind.Function
 		);
 		let syntax = stringArrayToCompletionItems(
 			RobotCompletionProvider.firstMatcher(firstSentences, SYNTAX), CompletionItemKind.Keyword
@@ -98,7 +98,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 	}
 
 	private static getLibAndSyntax(doc: RobotDoc): CompletionItem[] {
-		let libKey = stringArrayToCompletionItems(doc.library, CompletionItemKind.Function);
+		let libKey = stringArrayToCompletionItems(doc.library.concat(getConfigLibrary()), CompletionItemKind.Function);
 		let syntax = stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
 		return libKey.concat(syntax);;
 	}
@@ -120,6 +120,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 
 	private static firstMatcher(firstSentences: string, keys: string[]): string[] {
 		let result: string[] = [];
+		keys = Array.from(new Set(keys));
 		for (let i = 0; i < keys.length; i++) {
 			let found = keys[i].indexOf(firstSentences)
 			if (found == 0) {

@@ -13,6 +13,17 @@ export class WorkspaceContext {
     private static allRobotDoc: RobotDoc[];
     private static allPath: string[] = [];
     private static asyncReadingCounter: number = 0;
+    private static configFile: TextDocument;
+
+    /**
+     * Function to get config included in the workspace
+     */
+    public static getConfig() {
+        if(isNullOrUndefined(WorkspaceContext.configFile)){
+            return null;
+        }
+        return JSON.parse(WorkspaceContext.configFile.getText());
+    }
 
     /**
      * Function to get number of robot document in the workspace
@@ -144,6 +155,13 @@ export class WorkspaceContext {
             else if (fs.lstatSync(paths[i]).isFile()) {
                 if (/(\.robot|\.txt)$/.test(paths[i]) && !(/^\./.test(paths[i]))) {
                     allFiles.push(paths[i]);
+                }
+                else if (this.configFile == null && /config\.json$/.test(paths[i]) && !(/^\./.test(paths[i]))) {
+                    let opener = workspace.openTextDocument(Uri.file(paths[i])).then(
+                        (document) => {
+                            this.configFile = document;
+                        }
+                    );
                 }
             }
         }

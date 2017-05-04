@@ -1,6 +1,6 @@
 'use strict'
-import { WorkspaceContext } from '../../WorkspaceContext';
 
+import { WorkspaceContext } from '../../WorkspaceContext';
 import { Member } from '../../model/Member';
 import { RobotDoc } from '../../model/RobotDoc';
 import { TextDocument, Position, ReferenceProvider, ReferenceContext, ProviderResult, CancellationToken, Location } from 'vscode';
@@ -9,6 +9,7 @@ export class RobotReferenceProvider implements ReferenceProvider {
 
     public provideReferences(document: TextDocument, position: Position, context: ReferenceContext, token: CancellationToken)
         : ProviderResult<Array<Location>> {
+        WorkspaceContext.scanWorkspace();
         let thisDoc = WorkspaceContext.getDocumentByUri(document.uri)
         let variable = thisDoc.getVariableByPosition(position);
         let keyword = thisDoc.getKeywordByPosition(position);

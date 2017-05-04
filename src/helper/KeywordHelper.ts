@@ -1,7 +1,10 @@
 'use strict';
 
+import { isNullOrUndefined } from 'util';
+import { WorkspaceContext } from '../WorkspaceContext';
 import { Location, TextDocument, Range, Position } from 'vscode';
 import { Keyword } from '../model/Keyword';
+import { LIB } from '../dictionary/KeywordDictionary';
 
 /**
  * Function to get keyword by its position
@@ -91,5 +94,27 @@ export function searchKeywords(file: TextDocument): Keyword[] {
         }
     }
     return keywords;
+}
+
+/**
+ * Function to read default library on config file. it still using dictionary but it will updated later
+ */
+export function getConfigLibrary(): string[] {
+    let conf = WorkspaceContext.getConfig();
+    let libKey: string[] = [];
+    if (!isNullOrUndefined(conf)) {
+        if (!isNullOrUndefined(conf.lib)) {
+            if (Array.isArray(conf.lib)) {
+                for (let i = 0; i < conf.lib.length; i++) {
+                    for (let j = 0; j < LIB.length; j++) {
+                        if (LIB[j].name == conf.lib[i]) {
+                            libKey = libKey.concat(LIB[j].key);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return libKey;
 }
 
