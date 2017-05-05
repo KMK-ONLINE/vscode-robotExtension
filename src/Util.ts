@@ -10,7 +10,7 @@ import { CompletionItem, CompletionItemKind } from 'vscode';
  * @return string of file name
  */
 export function extractFileNameFromPath(path: string): string {
-    return path.match(/([!"#%&'*+,.:<=>@\_`~-]*|\w+)+\.?\w*$/)[0];
+    return path.match(/[^\\\/]\.?\S*$/)[0];
 }
 
 /**
@@ -21,7 +21,7 @@ export function extractFileNameFromPath(path: string): string {
  * @return string of file name
  */
 export function extractNameFromPath(path: string): string {
-    return extractFileNameFromPath(path).replace(/\.\w+$/, "");
+    return extractFileNameFromPath(path).replace(/\.\S+$/, "");
 }
 
 /**
