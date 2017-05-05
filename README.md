@@ -145,6 +145,9 @@ export class MyClass{
 
 ## Release Notes
 
+### 1.6.0
+Now you can create your own workspace configuration
+
 ### 1.5.0
 Added reference provider
 
