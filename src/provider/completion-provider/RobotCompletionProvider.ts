@@ -5,7 +5,7 @@ import { TextDocument, Position, CompletionItemProvider, CompletionItemKind, Com
 import { formatResources, formatFullResources } from '../../helper/ResourceHelper';
 import { getDocKeyByPos, getConfigLibrary } from '../../helper/KeywordHelper';
 import { stringArrayToCompletionItems, isIgnoreCompletion } from '../../Util';
-import { SYNTAX } from '../../dictionary/KeywordDictionary';
+import { BUILTIN } from '../../dictionary/KeywordDictionary';
 import { RobotDoc } from '../../model/RobotDoc';
 
 export class RobotCompletionProvider implements CompletionItemProvider {
@@ -53,7 +53,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 				}
 			}
 			else {
-				return stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
+				return stringArrayToCompletionItems(BUILTIN, CompletionItemKind.Keyword);
 			}
 		}
 		return null;
@@ -71,7 +71,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 			RobotCompletionProvider.firstMatcher(firstSentences, thisDoc.library.concat(getConfigLibrary())), CompletionItemKind.Function
 		);
 		let syntax = stringArrayToCompletionItems(
-			RobotCompletionProvider.firstMatcher(firstSentences, SYNTAX), CompletionItemKind.Keyword
+			RobotCompletionProvider.firstMatcher(firstSentences, BUILTIN), CompletionItemKind.Keyword
 		);
 		return local.concat(key, libKey, syntax);
 
@@ -99,7 +99,7 @@ export class RobotCompletionProvider implements CompletionItemProvider {
 
 	private static getLibAndSyntax(doc: RobotDoc): CompletionItem[] {
 		let libKey = stringArrayToCompletionItems(doc.library.concat(getConfigLibrary()), CompletionItemKind.Function);
-		let syntax = stringArrayToCompletionItems(SYNTAX, CompletionItemKind.Keyword);
+		let syntax = stringArrayToCompletionItems(BUILTIN, CompletionItemKind.Keyword);
 		return libKey.concat(syntax);;
 	}
 
