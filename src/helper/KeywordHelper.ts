@@ -73,17 +73,19 @@ export function searchKeywords(file: TextDocument): Keyword[] {
                     do {
                         i++;
                         line = file.lineAt(i).text;
-                        if (/^\s{2,}\[Arguments\]/i.test(line)) {
-                            args = line.split(/\s{2,}/).slice(2);
-                            for (let j = 0; j < args.length; j++) {
-                                args[j] = args[j].replace("${", "").replace("}", "");
+                        if (!isNullOrUndefined(line)) {
+                            if (/^\s{2,}\[Arguments\]/i.test(line)) {
+                                args = line.split(/\s{2,}/).slice(2);
+                                for (let j = 0; j < args.length; j++) {
+                                    args[j] = args[j].replace("${", "").replace("}", "");
+                                }
                             }
+                            else if (/^\s{2,}\[Return\]/i.test(line)) {
+                                ret = line.split(/\s{2,}/)[2].replace("${", "").replace("}", "");
+                            }
+                            match = line.match(/^((\w+\s?)+)$/);
+                            isInKeywordRange = !(/^\*\*\*+\s[\w+\s?]+\s\*\*\*/.test(line));
                         }
-                        else if (/^\s{2,}\[Return\]/i.test(line)) {
-                            ret = line.split(/\s{2,}/)[2].replace("${", "").replace("}", "");
-                        }
-                        match = line.match(/^((\w+\s?)+)$/);
-                        isInKeywordRange = !(/^\*\*\*+\s[\w+\s?]+\s\*\*\*/.test(line));
                     } while (ret == "" && match == null && i < file.lineCount - 1 && isInKeywordRange);
                     i--;
                     let key = new Keyword(keyword, loc, args, ret);
