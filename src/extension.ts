@@ -59,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
 			if (e.contentChanges[e.contentChanges.length - 1].text.includes("\n")) {
-				Promise.resolve(WorkspaceContext.scanWorkspace());
+				WorkspaceContext.scanWorkspace();
 			}
 		})
 	);
