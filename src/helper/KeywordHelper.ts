@@ -81,7 +81,10 @@ export function searchKeywords(file: TextDocument): Keyword[] {
                                 }
                             }
                             else if (/^\s{2,}\[Return\]/i.test(line)) {
-                                ret = line.split(/\s{2,}/)[2].replace("${", "").replace("}", "");
+                                let retur = line.split(/\s{2,}/)[2];
+                                if (!isNullOrUndefined(retur)) {
+                                    ret = retur.replace("${", "").replace("}", "");
+                                }
                             }
                             match = line.match(/^((\w+\s?)+)$/);
                             isInKeywordRange = !(/^\*\*\*+\s[\w+\s?]+\s\*\*\*/.test(line));
