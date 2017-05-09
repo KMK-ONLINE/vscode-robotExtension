@@ -1,6 +1,6 @@
 'use strict'
 
-import { Location, TextDocument, WorkspaceEdit, Position, Range } from 'vscode';
+import { Location, TextDocument, WorkspaceEdit, Position, Range, TextLine} from 'vscode';
 import { WorkspaceContext } from '../WorkspaceContext';
 import { Member } from '../model/Member';
 
