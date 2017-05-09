@@ -1,11 +1,11 @@
 'use strict'
 import { WorkspaceContext } from '../../WorkspaceContext';
 import { RobotDoc } from '../../model/RobotDoc';
-import { TextDocument, Position, DocumentFormattingEditProvider, Range, Location, WorkspaceEdit } from 'vscode';
+import { TextDocument, Position, DocumentFormattingEditProvider, Range, Location, TextEdit, FormattingOptions, CancellationToken } from 'vscode';
 
 export class RobotFormatProvider implements DocumentFormattingEditProvider{
 
-    public provideDocumentFormattingEdits(document: TextDocument):Thenable<WorkspaceEdit>|WorkspaceEdit{
+    public provideDocumentFormattingEdits(document: TextDocument, options: FormattingOptions, token: CancellationToken):Thenable<TextEdit[]>|TextEdit[]{
         
         return;
     }
