@@ -1,19 +1,15 @@
 'use strict'
-import { WorkspaceContext } from '../../WorkspaceContext';
-import { RobotDoc } from '../../model/RobotDoc';
+
 import { TextDocument, Position, DocumentFormattingEditProvider, Range, Location, TextEdit, FormattingOptions, CancellationToken } from 'vscode';
 import { getEmptyArrayOfString } from '../../Util';
+import { documentEditor } from '../../helper/Editor';
 
 export class RobotFormatProvider implements DocumentFormattingEditProvider {
 
     public provideDocumentFormattingEdits(document: TextDocument, options: FormattingOptions, token: CancellationToken): Thenable<TextEdit[]> | TextEdit[] {
         let ranges = RobotFormatProvider.getAllLineRange(document);
         let formatted = RobotFormatProvider.getFormattedLines(document);
-        let editor:TextEdit[] = [];
-        for(let i = 0; i < formatted.length; i++){
-            editor.push(new TextEdit(ranges[i], formatted[i]));
-        }
-        return editor;
+        return documentEditor(ranges, formatted);
     }
 
     private static getAllLineRange(document: TextDocument): Range[] {
@@ -76,26 +72,26 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
     }
 
     private static getLengthGuide(lines: string[], formatCode: number[]): number[][] {
-        let guides:number[][] = [];
+        let guides: number[][] = [];
         guides.push([]);
         guides.push([]);
-        for(let i = 0; i < lines.length; i++){
+        for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
-            if(formatCode[i] == 0 || formatCode[i] == 1){
-                let sentences :string[];
+            if (formatCode[i] == 0 || formatCode[i] == 1) {
+                let sentences: string[];
                 let code = formatCode[i];
-                if(code == 1){
+                if (code == 1) {
                     sentences = line.replace(/^\s+/, "").split(/\s{2,}/);
                 }
-                else{
+                else {
                     sentences = line.split(/\s{2,}/);
                 }
-                for(let j = 0; j < sentences.length; j++){
+                for (let j = 0; j < sentences.length; j++) {
                     let sentence = sentences[j];
-                    if(guides[code].length == j){
+                    if (guides[code].length == j) {
                         guides[code].push(sentence.length + 6);
                     }
-                    else if(guides[code][j] < sentence.length + 6){
+                    else if (guides[code][j] < sentence.length + 6) {
                         guides[code][j] = sentence.length + 6;
                     }
                 }

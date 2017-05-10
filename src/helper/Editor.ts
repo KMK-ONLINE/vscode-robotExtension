@@ -1,8 +1,24 @@
 'use strict'
 
-import { Location, TextDocument, WorkspaceEdit, Position, Range, TextLine} from 'vscode';
+import { Location, TextDocument, WorkspaceEdit, Position, Range, TextLine, TextEdit } from 'vscode';
 import { WorkspaceContext } from '../WorkspaceContext';
 import { Member } from '../model/Member';
+
+/**
+ * Function to edit range in document with new string using TextEdit Object
+ * 
+ * @param ranges array of Range which will edited
+ * @param newStr array of string which will replace the range
+ * 
+ * @return array of TextEdit Object
+ */
+export function documentEditor(ranges: Range[], newStr: string[]): TextEdit[] {
+        let editor: TextEdit[] = [];
+        for (let i = 0; i < newStr.length; i++) {
+                editor.push(new TextEdit(ranges[i], newStr[i]));
+        }
+        return editor;
+}
 
 /**
  * Function to replace location with new string using WorkspaceEdit Object
