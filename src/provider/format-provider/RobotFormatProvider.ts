@@ -30,14 +30,14 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
             temp.push(line.replace(/\s+$/, ""));
             if (/^\S+/.test(line)) {
                 if (line.replace(/\s+$/, "").replace(/^\\\s+/, "\\ ").split(/\s{2,}/).length > 1) {
-                    formatCode.push(0); //0 for settings component
+                    formatCode.push(0);
                 }
                 else {
-                    formatCode.push(2); //2 for keyword, testcase or field initialization
+                    formatCode.push(2);
                 }
             }
             else if (/^\s*$/.test(line)) {
-                formatCode.push(4); //3 for empty line
+                formatCode.push(4);
             }
             else if (/^\s*#/.test(line)) {
                 formatCode.push(2);
@@ -46,7 +46,7 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
                 formatCode.push(3)
             }
             else {
-                formatCode.push(1); //1 for general
+                formatCode.push(1);
             }
         }
         let lengthGuide: number[][] = RobotFormatProvider.getLengthGuide(temp, formatCode);
@@ -80,7 +80,7 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
                     let sentence = sentences[j];
                     formatted[i] = formatted[i] + sentence
                     if(j < sentences.length - 1){
-                        formatted[i] = formatted[i] + "        ";
+                        formatted[i] = formatted[i] + "  ";
                     }
                 }
             }

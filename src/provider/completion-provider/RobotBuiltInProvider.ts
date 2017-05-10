@@ -19,8 +19,8 @@ export class RobotBuiltInProvider implements CompletionItemProvider {
     ];
 
     private static controlDictionary: string[] = [
-        "FOR        ${index}          IN RANGE        ",
-        "FOR        ${element}        IN        ",
+        "FOR  ${index}  IN RANGE  ",
+        "FOR  ${element}  IN  ",
     ]
 
     public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken)
