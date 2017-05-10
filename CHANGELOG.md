@@ -5,6 +5,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Released]
 
+## [1.6.4] 10-may-17
+### Added
+- Shortcut to format the document
+
 ## [1.6.0] 4-may-17
 ### Added
 - Now the extension can have default configuration for default library for autocomplete 

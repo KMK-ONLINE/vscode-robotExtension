@@ -5,6 +5,11 @@ This Extension was created for internal use for Test Engineer at KMK-Labs, but p
 
 ## Features
 
+* Document Formatter
+    * it automatically format the document for readability purpose
+
+![Document Formatter](document-formatter.png)
+
 * Keyword Autocomplete
     * it scans all the included resources and search for its keywords
     * it will suggest common keywords from BuiltIn, Selenium2Library, ExtendedSelenium2Library, and more

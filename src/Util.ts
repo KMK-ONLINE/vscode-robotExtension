@@ -94,3 +94,18 @@ export function subArrayOfString(list: string[], start: number): string[] {
 export function isIgnoreCompletion(line: string){
     return /^\s*\[(Documentation|\d+|Tags)\]/.test(line);
 }
+
+/**
+ * Function to get empty array of string
+ * 
+ * @param length length of array
+ * 
+ * @return empty arrayn of string
+ */
+export function getEmptyArrayOfString(length: number):string[]{
+    let str = new Array(length);
+    for(let i = 0; i < length; i++){
+        str[i] = "";
+    }
+    return str;
+}

@@ -5,6 +5,7 @@ import { RobotReferenceProvider } from './provider/reference-provider/RobotRefer
 import { RobotCompletionProvider } from './provider/completion-provider/RobotCompletionProvider';
 import { RobotDotCompletionProvider } from './provider/completion-provider/RobotDotCompletionProvider';
 import { RobotVariableCompletionProvider } from './provider/completion-provider/RobotVariableCompletionProvider';
+import { RobotFormatProvider } from './provider/format-provider/RobotFormatProvider';
 import { RobotBuiltInProvider } from './provider/completion-provider/RobotBuiltInProvider';
 import { RobotDefinitionProvider } from './provider/definition-provider/RobotDefinitionProvider';
 import { RobotRenameProvider } from './provider/rename-provider/RobotRenameProvider';
@@ -52,6 +53,14 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerReferenceProvider(
 			'robot', new RobotReferenceProvider()
 		)
+	);
+	context.subscriptions.push(
+		vscode.languages.registerDocumentFormattingEditProvider(
+			'robot', new RobotFormatProvider()
+		)
+	);
+	context.subscriptions.push(
+		vscode.workspace.onDidSaveTextDocument(WorkspaceContext.scanWorkspace)
 	);
 	context.subscriptions.push(
 		vscode.workspace.onDidOpenTextDocument(WorkspaceContext.scanWorkspace)
