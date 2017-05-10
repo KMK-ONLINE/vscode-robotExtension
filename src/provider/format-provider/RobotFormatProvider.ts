@@ -29,7 +29,7 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
             let line = document.lineAt(i).text;
             temp.push(line.replace(/\s+$/, ""));
             if (/^\S+/.test(line)) {
-                if (line.replace(/\s+$/, "").split(/\s{2,}/).length > 1) {
+                if (line.replace(/\s+$/, "").replace(/^\\\s+/, "\\ ").split(/\s{2,}/).length > 1) {
                     formatCode.push(0); //0 for settings component
                 }
                 else {
@@ -37,7 +37,13 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
                 }
             }
             else if (/^\s*$/.test(line)) {
-                formatCode.push(3); //3 for empty line
+                formatCode.push(4); //3 for empty line
+            }
+            else if (/^\s*#/.test(line)) {
+                formatCode.push(2);
+            }
+            else if(/^\s*:/.test(line)){
+                formatCode.push(3)
             }
             else {
                 formatCode.push(1); //1 for general
@@ -51,14 +57,14 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
                 let guide = formatCode[i];
                 if (formatCode[i] == 1) {
                     formatted[i] = "    ";
-                    sentences = line.replace(/^\s+/, "").split(/\s{2,}/);
+                    sentences = line.replace(/^\s+/, "").replace(/^\\\s+/, "\\ ").split(/\s{2,}/);
                 }
                 else {
                     sentences = line.split(/\s{2,}/);
                 }
                 for (let j = 0; j < sentences.length; j++) {
-                    let sentence = sentences[j];
-                    while (sentence.length < lengthGuide[guide][j]) {
+                    let sentence = sentences[j].replace(/\\\s/, "\\    ");
+                    while (sentence.length < lengthGuide[guide][j] && j < sentences.length - 1) {
                         sentence = sentence + " ";
                     }
                     formatted[i] = formatted[i] + sentence;
@@ -66,6 +72,17 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
             }
             else if (formatCode[i] == 2) {
                 formatted[i] = line;
+            }
+            else if(formatCode[i] == 3){
+                let sentences = line.replace(/^\s+/, "").split(/\s{2,}/);
+                formatted[i] = "    ";
+                for(let j = 0; j < sentences.length; j++){
+                    let sentence = sentences[j];
+                    formatted[i] = formatted[i] + sentence
+                    if(j < sentences.length - 1){
+                        formatted[i] = formatted[i] + "        ";
+                    }
+                }
             }
         }
         return formatted;
@@ -81,18 +98,21 @@ export class RobotFormatProvider implements DocumentFormattingEditProvider {
                 let sentences: string[];
                 let code = formatCode[i];
                 if (code == 1) {
-                    sentences = line.replace(/^\s+/, "").split(/\s{2,}/);
+                    sentences = line.replace(/^\s+/, "").replace(/^\\\s+/, "\\ ").split(/\s{2,}/);
                 }
                 else {
                     sentences = line.split(/\s{2,}/);
                 }
                 for (let j = 0; j < sentences.length; j++) {
-                    let sentence = sentences[j];
-                    if (guides[code].length == j) {
-                        guides[code].push(sentence.length + 6);
+                    let sentence = sentences[j].replace(/^\\\s/, "\\    ");
+                    if (j == sentences.length - 1 && /^#/.test(sentence)) {
+                        break;
                     }
-                    else if (guides[code][j] < sentence.length + 6) {
-                        guides[code][j] = sentence.length + 6;
+                    if (guides[code].length == j) {
+                        guides[code].push(sentence.length + 4);
+                    }
+                    else if (guides[code][j] < sentence.length + 4) {
+                        guides[code][j] = sentence.length + 4;
                     }
                 }
             }

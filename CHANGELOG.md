@@ -5,9 +5,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Released]
 
+## [1.6.5] 10-may-17
+### Fixed
+- Various fixes for formatter
+
 ## [1.6.4] 10-may-17
 ### Added
-- Shortcut to format the document
+- Formatter for robot the document
 
 ## [1.6.0] 4-may-17
 ### Added
