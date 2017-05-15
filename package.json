@@ -2,7 +2,7 @@
     "name": "robotf-extension",
     "displayName": "RobotF Extension",
     "description": "Extension for robot framework",
-    "version": "1.6.6",
+    "version": "1.6.7",
     "publisher": "kmk-labs",
     "icon": "icon.png",
     "engines": {

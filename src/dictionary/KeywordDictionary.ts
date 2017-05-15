@@ -25,31 +25,53 @@ export var BUILTIN: string[] = [
 export var LIB =
 	[
 		{
+			name: "FakerLibrary",
+			key: [
+				"Add Provider", "Address", "Am Pm", "Boolean", "Bothify", "Bs", "Building Number", "Catch Phrase", "Century", "Chrome", "City",
+				"City Prefix", "City Suffix", "Color Name", "Company", "Company Email", "Company Suffix", "Country", "Country Code",
+				"Credit Card Expire", "Credit Card Full", "Credit Card Number", "Credit Card Provider", "Credit Card Security Code", "Date",
+				"Date Time", "Date Time Ad", "Date Time Between", "Date Time This Century", "Date Time This Decade", "Date Time This Month",
+				"Date Time This Year", "Day Of Month", "Day Of Week", "Domain Name", "Domain Word", "Email", "Firefox", "First Name",
+				"First Name Female", "First Name Male", "Format", "Free Email", "Free Email Domain", "Generator Format Token", "Geo Coordinate",
+				"Get Formatter", "Get Providers", "Hex Color", "Init", "Internet Explorer", "Ipv 4", "Ipv 6", "Iso 8601", "Job", "Language Code",
+				"Last Name", "Latitude", "Lexify", "Linux Platform Token", "Linux Processor", "Locale", "Longitude", "Mac Platform Token",
+				"Mac Processor", "Md 5", "Mime Type", "Month", "Month Name", "Name", "Name Female", "Name Male", "Null Boolean", "Numerify",
+				"Opera", "Paragraph", "Paragraphs", "Parse", "Password", "Phone Number", "Postcode", "Prefix", "Prefix Female", "Prefix Male",
+				"Profile", "Provider", "Pybool", "Pydecimal", "Pydict", "Pyfloat", "Pyint", "Pyiterable", "Pylist", "Pyset", "Pystr", "Pystruct",
+				"Pytuple", "Random Digit", "Random Digit Not Null", "Random Digit Not Null Or Empty", "Random Digit Or Empty", "Random Element",
+				"Random Int", "Random Letter", "Random Number", "Randomize Nb Elements", "Rgb Color", "Rgb Color List", "Rgb Css Color", "Safari",
+				"Safe Color Name", "Safe Email", "Safe Hex Color", "Secondary Address", "Seed", "Sentence", "Sentences", "Set Formatter", "Sha 1",
+				"Sha 256", "Simple Profile", "Slug", "Ssn", "State", "State Abbr", "Street Address", "Street Name", "Street Suffix", "Suffix",
+				"Suffix Female", "Suffix Male", "Text", "Time", "Timezone", "Tld", "Unix Time", "Uri", "Uri Extension", "Uri Page", "Uri Path",
+				"Url", "User Agent", "User Name", "Windows Platform Token", "Word", "Words", "Year"
+			]
+		},
+		{
 			name: "AppiumLibrary",
 			key: [
-				"Background App", "Capture Page Screenshot", "Clear Text", "Click Button", "Click Element", "Close All Applications", 
-				"Close Application", "Element Name Should Be", "Element Should Be Disabled", "Element Should Be Enabled", "Get Contexts", 
-				"Get Current Context", "Get Network Connection Status", "Get Source", "Go Back", "Go To Url", "Hide Keyboard", "Input Password", 
-				"Input Text", "Input Value", "Lock", "Log Source", "Long Press", "Long Press Keycode", "Open Application", 
-				"Page Should Contain Element", "Page Should Contain Text", "Page Should Not Contain Element", "Page Should Not Contain Text", 
-				"Pinch", "Press Keycode", "Pull File", "Pull Folder", "Push File", "Register Keyword To Run On Failure", "Remove Application", 
-				"Reset Application", "Scroll", "Set Network Connection Status", "Shake", "Swipe", "Switch Application", "Switch To Context", 
-				"Tap", "Wait Until Page Contains", "Wait Until Page Contains Element", "Wait Until Page Does Not Contain", 
+				"Background App", "Capture Page Screenshot", "Clear Text", "Click Button", "Click Element", "Close All Applications",
+				"Close Application", "Element Name Should Be", "Element Should Be Disabled", "Element Should Be Enabled", "Get Contexts",
+				"Get Current Context", "Get Network Connection Status", "Get Source", "Go Back", "Go To Url", "Hide Keyboard", "Input Password",
+				"Input Text", "Input Value", "Lock", "Log Source", "Long Press", "Long Press Keycode", "Open Application",
+				"Page Should Contain Element", "Page Should Contain Text", "Page Should Not Contain Element", "Page Should Not Contain Text",
+				"Pinch", "Press Keycode", "Pull File", "Pull Folder", "Push File", "Register Keyword To Run On Failure", "Remove Application",
+				"Reset Application", "Scroll", "Set Network Connection Status", "Shake", "Swipe", "Switch Application", "Switch To Context",
+				"Tap", "Wait Until Page Contains", "Wait Until Page Contains Element", "Wait Until Page Does Not Contain",
 				"Wait Until Page Does Not Contain Element", "Zoom"
 			]
 		},
 		{
 			name: "Process",
 			key: [
-				"Get Process Id", "Get Process Object", "Get Process Result", "Is Process Running", "Join Command Line", "Process Should Be Running", 
-				"Process Should Be Stopped", "Run Process", "Send Signal To Process", "Split Command Line", "Start Process", "Switch Process", 
+				"Get Process Id", "Get Process Object", "Get Process Result", "Is Process Running", "Join Command Line", "Process Should Be Running",
+				"Process Should Be Stopped", "Run Process", "Send Signal To Process", "Split Command Line", "Start Process", "Switch Process",
 				"Terminate All Processes", "Terminate Process", "Wait For Process"
 			]
 		},
 		{
 			name: "DateTime",
 			key: [
-				"Add Time To Date", "Add Time To Time", "Convert Date", "Convert Time", "Get Current Date", "Subtract Date From Date", 
+				"Add Time To Date", "Add Time To Time", "Convert Date", "Convert Time", "Get Current Date", "Subtract Date From Date",
 				"Subtract Time From Date", "Subtract Time From Time"
 			]
 		},
