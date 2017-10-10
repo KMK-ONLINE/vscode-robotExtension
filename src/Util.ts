@@ -109,3 +109,11 @@ export function getEmptyArrayOfString(length: number):string[]{
     }
     return str;
 }
+
+export function multiplyString(base: string, times: number): string {
+    let result = '';
+    for (let i = 0; i < times; i++) {
+        result += base;
+    }
+    return result;
+}
