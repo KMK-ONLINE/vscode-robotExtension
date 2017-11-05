@@ -24,6 +24,14 @@ export var BUILTIN: string[] = [
 
 export var LIB =
 	[
+        	{
+            		name: "RequestsLibrary",
+            		key: [
+                		"Create Digest Session", "Create Ntlm Session", "Create Session", "Delete", "Delete All Sessions", "Delete Request", "Get", 
+                		"Get Request", "Head", "Head Request", "Options", "Options Request", "Patch", "Patch Request", "Post", "Post Request", "Put", 
+                		"Put Request", "To Json" 
+            		]
+        	},
 		{
 			name: "FakerLibrary",
 			key: [
